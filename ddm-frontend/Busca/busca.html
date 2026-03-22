@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DDM Zona Sul — Consultar Ocorrências</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@600&family=DM+Sans:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --navy: #0d1b2a;
+        --navy2: #111f30;
+        --navy3: #162840;
+        --teal: #1a6b72;
+        --teal-l: #22919a;
+        --rose: #c0364a;
+        --text: #e8e2da;
+        --muted: #7a93a8;
+        --line: rgba(255, 255, 255, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--navy);
+        color: var(--text);
+        padding: 2rem;
+      }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      h2 {
+        font-family: "Crimson Pro", serif;
+        font-size: 2.2rem;
+        color: var(--teal-l);
+        margin-bottom: 1.5rem;
+      }
+
+      /* Painel de Filtros */
+      .filter-card {
+        background: var(--navy2);
+        border: 1px solid var(--line);
+        padding: 1.5rem;
+        border-radius: 14px;
+        margin-bottom: 2rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .field label {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 700;
+        letter-spacing: 0.05em;
+      }
+      .field input,
+      .field select {
+        padding: 0.8rem;
+        background: var(--navy3);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: #fff;
+        outline: none;
+        transition: 0.2s;
+      }
+      .field input:focus {
+        border-color: var(--teal-l);
+        box-shadow: 0 0 0 2px rgba(34, 145, 154, 0.2);
+      }
+
+      /* Lista de Resultados */
+      .results-grid {
+        display: grid;
+        gap: 1rem;
+      }
+      .case-card {
+        background: var(--navy2);
+        border: 1px solid var(--line);
+        padding: 1.5rem;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: 0.2s;
+        cursor: pointer;
+        animation: fadeIn 0.3s ease-out;
+      }
+      .case-card:hover {
+        border-color: var(--teal-l);
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .case-info h4 {
+        margin-bottom: 6px;
+        font-size: 1.2rem;
+        color: #fff;
+      }
+      .case-info p {
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .meta-tags {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .meta-item {
+        font-size: 0.75rem;
+        background: var(--navy3);
+        padding: 4px 8px;
+        border-radius: 4px;
+        border: 1px solid var(--line);
+      }
+      .meta-item b {
+        color: var(--teal-l);
+      }
+
+      .status-tag {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .status-Ativo {
+        background: rgba(34, 145, 154, 0.15);
+        color: var(--teal-l);
+        border: 1px solid var(--teal-l);
+      }
+      .status-Concluído {
+        background: rgba(192, 54, 74, 0.15);
+        color: var(--rose);
+        border: 1px solid var(--rose);
+      }
+
+      .no-results {
+        text-align: center;
+        padding: 4rem;
+        color: var(--muted);
+        border: 2px dashed var(--line);
+        border-radius: 14px;
+      }
+
+      .nav-buttons {
+        margin-bottom: 1.5rem;
+      }
+      .btn-back {
+        background: transparent;
+        color: var(--muted);
+        border: 1px solid var(--line);
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 0.9rem;
+        display: inline-block;
+      }
+      .btn-back:hover {
+        color: #fff;
+        border-color: var(--teal-l);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="nav-buttons">
+        <a href="nova-ocorrencia.html" class="btn-back">+ Nova Ocorrência</a>
+      </div>
+
+      <h2>Consulta de Ocorrências</h2>
+
+      <div class="filter-card">
+        <div class="field">
+          <label>Nome da Vítima</label>
+          <input
+            type="text"
+            id="f-nome"
+            placeholder="Filtrar por nome..."
+            oninput="filtrar()"
+          />
+        </div>
+        <div class="field">
+          <label>CPF da Vítima</label>
+          <input
+            type="text"
+            id="f-cpf"
+            placeholder="000.000.000-00"
+            maxlength="14"
+            oninput="
+              maskCPF(this);
+              filtrar();
+            "
+          />
+        </div>
+        <div class="field">
+          <label>Data da Ocorrência</label>
+          <input type="date" id="f-data" oninput="filtrar()" />
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="f-status" onchange="filtrar()">
+            <option value="">Todos</option>
+            <option value="Ativo">Abertos (Ativos)</option>
+            <option value="Concluído">Encerrados</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="lista-casos" class="results-grid"></div>
+    </div>
+
+    <script>
+      // Função para formatar data de YYYY-MM-DD para DD/MM/YYYY
+      function formatarDataBR(dataISO) {
+        if (!dataISO) return "---";
+        const [data] = dataISO.split("T");
+        const [ano, mes, dia] = data.split("-");
+        return `${dia}/${mes}/${ano}`;
+      }
+
+      function maskCPF(i) {
+        let v = i.value.replace(/\D/g, "");
+        v = v
+          .replace(/(\d{3})(\d)/, "$1.$2")
+          .replace(/(\d{3})(\d)/, "$1.$2")
+          .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        i.value = v;
+      }
+
+      function filtrar() {
+        const casos = JSON.parse(localStorage.getItem("casos")) || [];
+
+        const fNome = document.getElementById("f-nome").value.toLowerCase();
+        const fCpf = document.getElementById("f-cpf").value.replace(/\D/g, ""); // Remove pontos/traços para busca limpa
+        const fData = document.getElementById("f-data").value;
+        const fStatus = document.getElementById("f-status").value;
+
+        const filtrados = casos.filter((c) => {
+          const nomeMatch = c.vitima.toLowerCase().includes(fNome);
+
+          // Busca por CPF (compara apenas os números para evitar erros de formatação)
+          const cpfLimpo = (c.cpf || "").replace(/\D/g, "");
+          const cpfMatch = fCpf ? cpfLimpo.includes(fCpf) : true;
+
+          // Busca por Data (compara o início da string YYYY-MM-DD)
+          const dataMatch = fData ? c.data && c.data.startsWith(fData) : true;
+
+          const statusMatch = fStatus ? c.status === fStatus : true;
+
+          return nomeMatch && cpfMatch && dataMatch && statusMatch;
+        });
+
+        renderizar(filtrados);
+      }
+
+      function renderizar(lista) {
+        const container = document.getElementById("lista-casos");
+
+        if (lista.length === 0) {
+          container.innerHTML = `
+        <div class="no-results">
+          <p>Nenhuma ocorrência encontrada com os filtros aplicados.</p>
+        </div>`;
+          return;
+        }
+
+        container.innerHTML = lista
+          .map(
+            (c) => `
+      <div class="case-card" onclick="irParaDetalhes('${c.id}')">
+        <div class="case-info">
+          <h4>${c.vitima}</h4>
+          <p>Agressor: <strong>${c.agressor || "Não identificado"}</strong></p>
+          <div class="meta-tags">
+            <span class="meta-item"><b>ID:</b> ${c.id}</span>
+            <span class="meta-item"><b>CPF:</b> ${c.cpf || "---"}</span>
+            <span class="meta-item"><b>Data:</b> ${formatarDataBR(c.data)}</span>
+            <span class="meta-item"><b>Risco:</b> ${c.risco || 0} pts</span>
+          </div>
+        </div>
+        <div style="text-align: right">
+          <div class="status-tag status-${c.status || "Ativo"}">${c.status || "Ativo"}</div>
+          <div style="margin-top: 12px; font-size: 0.75rem; color: var(--teal-l); font-weight: 600;">ABRIR PRONTUÁRIO →</div>
+        </div>
+      </div>
+    `,
+          )
+          .join("");
+      }
+
+      function irParaDetalhes(id) {
+        const casos = JSON.parse(localStorage.getItem("casos")) || [];
+        const caso = casos.find((c) => c.id === id);
+        if (caso) {
+          localStorage.setItem("casoSelecionado", JSON.stringify(caso));
+          window.location.href = "detalhes.html";
+        }
+      }
+
+      // Inicialização ao carregar a página
+      window.onload = filtrar;
+    </script>
+  </body>
+</html>

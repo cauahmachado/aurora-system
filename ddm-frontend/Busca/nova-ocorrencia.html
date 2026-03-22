@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DDM Zona Sul — Nova Ocorrência</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0d1b2a;
+      --navy2:  #111f30;
+      --navy3:  #162840;
+      --teal:   #1a6b72;
+      --teal-l: #22919a;
+      --rose:   #c0364a;
+      --rose-l: #e04d62;
+      --gold:   #c9a84c;
+      --gold-l: #e0bc6a;
+      --green:  #2a7d4f;
+      --green-l:#35a066;
+      --text:   #e8e2da;
+      --muted:  #7a93a8;
+      --line:   rgba(255,255,255,0.07);
+      --sidebar:230px;
+    }
+
+    html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--text); }
+
+    /* ── LAYOUT ── */
+    .app { display: flex; min-height: 100vh; }
+
+    /* ══ SIDEBAR ══ */
+    .sidebar {
+      width: var(--sidebar); min-width: var(--sidebar);
+      background: var(--navy2); border-right: 1px solid var(--line);
+      display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh;
+    }
+    .sidebar-brand {
+      padding: 1.4rem 1.2rem 1.2rem; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .brand-icon {
+      width: 36px; height: 36px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--teal), var(--teal-l));
+      border-radius: 8px; display: grid; place-items: center;
+      box-shadow: 0 0 18px rgba(26,107,114,.4);
+    }
+    .brand-icon svg { width: 18px; height: 18px; fill: #fff; }
+    .brand-label { font-size: .78rem; font-weight: 600; color: #fff; line-height: 1.3; }
+    .brand-label span { display: block; font-size: .68rem; font-weight: 400; color: var(--muted); }
+    .nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
+    .nav-section { font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: .8rem 1.2rem .4rem; }
+    .nav-item {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .65rem 1.2rem; cursor: pointer;
+      border-left: 3px solid transparent; transition: all .2s;
+      font-size: .87rem; color: var(--muted); user-select: none;
+    }
+    .nav-item svg { width: 17px; height: 17px; stroke: currentColor; flex-shrink: 0; fill: none; stroke-width: 2; }
+    .nav-item:hover { background: rgba(255,255,255,.04); color: var(--text); }
+    .nav-item.active { background: rgba(26,107,114,.12); border-left-color: var(--teal-l); color: var(--teal-l); }
+    .nav-item .badge-count { margin-left: auto; background: var(--rose); color: #fff; font-size: .65rem; font-weight: 600; padding: .15rem .45rem; border-radius: 100px; }
+    
+    .sidebar-user { padding: 1rem 1.2rem; border-top: 1px solid var(--line); display: flex; align-items: center; gap: .75rem; }
+    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--rose), var(--rose-l)); display: grid; place-items: center; font-size: .8rem; font-weight: 600; color: #fff; flex-shrink: 0; }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: .82rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-role { font-size: .7rem; color: var(--muted); }
+
+    /* ══ MAIN ══ */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .topbar { padding: 1.1rem 2rem; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .topbar-left { display: flex; align-items: center; gap: .8rem; }
+    .back-btn { background: rgba(255,255,255,.05); border: 1px solid var(--line); border-radius: 8px; padding: .4rem .8rem; color: var(--muted); font-size: .8rem; cursor: pointer; display: flex; align-items: center; gap: .4rem; transition: all .2s; font-family: 'DM Sans', sans-serif; text-decoration: none; }
+    .back-btn:hover { background: rgba(255,255,255,.09); color: var(--text); }
+    .back-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .topbar-title { font-family: 'Crimson Pro', serif; font-size: 1.4rem; font-weight: 600; color: #fff; }
+
+    /* ══ CONTENT ══ */
+    .content { flex: 1; overflow-y: auto; padding: 2rem; }
+    .form-layout { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; align-items: start; }
+
+    .form-section { background: var(--navy2); border: 1px solid var(--line); border-radius: 14px; padding: 1.6rem 1.8rem; margin-bottom: 1.2rem; animation: fadeUp .4s ease both; }
+    .section-head { display: flex; align-items: center; gap: .7rem; margin-bottom: 1.4rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+    .section-icon { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; flex-shrink: 0; }
+    .section-icon svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; }
+    .si-teal { background: rgba(26,107,114,.25); }
+    .si-rose { background: rgba(192,54,74,.25); }
+    .si-gold { background: rgba(201,168,76,.2); }
+    .section-head-text h3 { font-size: .95rem; font-weight: 600; color: #fff; }
+    .section-head-text p { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
+
+    .fields-grid { display: grid; gap: .9rem; }
+    .g2 { grid-template-columns: 1fr 1fr; }
+    .span2 { grid-column: span 2; }
+
+    .field { display: flex; flex-direction: column; gap: .4rem; }
+    .field label { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); display: flex; align-items: center; gap: .3rem; }
+    .req { color: var(--rose-l); font-size: .8rem; }
+    .field input, .field select, .field textarea { width: 100%; padding: .7rem .9rem; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 9px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .88rem; outline: none; transition: 0.2s; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--teal-l); background: rgba(26,145,154,.07); }
+
+    .check-row { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .2rem; }
+    .check-item { display: flex; align-items: center; gap: .5rem; background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 8px; padding: .5rem .85rem; cursor: pointer; transition: all .2s; user-select: none; font-size: .83rem; color: var(--muted); }
+    .check-item input { display: none; }
+    .check-item .box { width: 16px; height: 16px; border: 1.5px solid rgba(255,255,255,.2); border-radius: 4px; display: grid; place-items: center; flex-shrink: 0; }
+    .check-item .box svg { width: 10px; height: 10px; stroke: #fff; opacity: 0; fill: none; stroke-width: 3; }
+    .check-item.checked { background: rgba(26,107,114,.15); border-color: rgba(26,107,114,.4); color: var(--teal-l); }
+    .check-item.checked .box { background: var(--teal); border-color: var(--teal); }
+    .check-item.checked .box svg { opacity: 1; }
+
+    /* ══ RISK PANEL ══ */
+    .risk-panel { position: sticky; top: 0; background: var(--navy2); border: 1px solid var(--line); border-radius: 14px; padding: 1.4rem; animation: fadeUp .4s .2s ease both; }
+    .risk-panel-title { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 1.2rem; }
+    .risk-score-row { display: flex; align-items: flex-end; gap: .5rem; margin-bottom: .6rem; }
+    .risk-score { font-family: 'Crimson Pro', serif; font-size: 3rem; font-weight: 600; line-height: 1; color: #fff; }
+    .risk-bar-track { height: 8px; background: rgba(255,255,255,.07); border-radius: 100px; overflow: hidden; margin-bottom: .8rem; }
+    .risk-bar-fill { height: 100%; width: 0%; transition: 0.5s cubic-bezier(.4,0,.2,1); background: var(--green-l); }
+    .risk-label { display: inline-flex; align-items: center; gap: .5rem; padding: .35rem .9rem; border-radius: 100px; font-size: .8rem; font-weight: 600; }
+    
+    .rl-baixo { background: rgba(42,125,79,.15); color: var(--green-l); border: 1px solid rgba(42,125,79,.3); }
+    .rl-medio { background: rgba(26,145,154,.12); color: var(--teal-l); border: 1px solid rgba(26,145,154,.25); }
+    .rl-alto { background: rgba(201,168,76,.12); color: var(--gold-l); border: 1px solid rgba(201,168,76,.25); }
+    .rl-critico { background: rgba(192,54,74,.15); color: var(--rose-l); border: 1px solid rgba(192,54,74,.3); }
+
+    .factor-item { display: flex; justify-content: space-between; padding: .45rem 0; border-bottom: 1px solid var(--line); font-size: .78rem; color: var(--text); }
+    .factor-pts { color: var(--rose-l); font-weight: 600; }
+
+    .btn-row { display: flex; gap: .7rem; margin-top: 1rem; }
+    .btn-primary { flex: 1; padding: .8rem; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--teal), var(--teal-l)); color: #fff; font-weight: 600; cursor: pointer; box-shadow: 0 6px 20px rgba(26,107,114,.35); }
+    .btn-secondary { padding: .8rem 1rem; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      </div>
+      <div class="brand-label">DDM Zona Sul <span>Sistema Interno</span></div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Principal</div>
+      <div class="nav-item" onclick="window.location.href='index.html'"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+      <div class="nav-item active"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Ocorrências</div>
+      <div class="nav-section">Análise</div>
+      <div class="nav-item" onclick="window.location.href='busca.html'"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar Caso</div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="busca.html" class="back-btn"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Voltar</a>
+        <div class="topbar-title">Nova Ocorrência</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="form-layout">
+        <div class="form-col">
+          <div class="form-section">
+            <div class="section-head">
+              <div class="section-icon si-teal"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+              <div class="section-head-text"><h3>Dados da Vítima</h3><p>Identificação obrigatória</p></div>
+            </div>
+            <div class="fields-grid g2">
+              <div class="field span2"><label>Nome completo <span class="req">*</span></label><input type="text" id="v-nome"></div>
+              <div class="field"><label>CPF <span class="req">*</span></label><input type="text" id="v-cpf" maxlength="14" oninput="maskCPF(this)"></div>
+              <div class="field"><label>Telefone <span class="req">*</span></label><input type="text" id="v-tel" maxlength="15" oninput="maskTel(this)"></div>
+              <div class="field"><label>Possui botão do pânico?</label><select id="v-panico" onchange="calcRisco()"><option value="">Selecione</option><option value="sim">Sim</option><option value="nao">Não</option></select></div>
+              <div class="field"><label>Possui rede de apoio?</label><select id="v-apoio" onchange="calcRisco()"><option value="">Selecione</option><option value="sim">Sim</option><option value="nao">Não</option></select></div>
+              <div class="field span2"><label>Filhos menores no domicílio</label>
+                <div class="check-row">
+                  <label class="check-item" onclick="toggleCheck(this,'v-filhos')">
+                    <input type="checkbox" id="v-filhos" onchange="calcRisco()"><span class="box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Há filhos menores
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-head">
+              <div class="section-icon si-rose"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+              <div class="section-head-text"><h3>Dados do Agressor</h3><p>Fatores comportamentais</p></div>
+            </div>
+            <div class="fields-grid g2">
+              <div class="field span2"><label>Nome do Agressor</label><input type="text" id="a-nome"></div>
+              <div class="field"><label>Grau de parentesco <span class="req">*</span></label>
+                <select id="a-parentesco" onchange="calcRisco()">
+                  <option value="">Selecione</option>
+                  <option value="ex-conjuge">Ex-cônjuge / Companheiro</option>
+                  <option value="conjuge">Cônjuge atual</option>
+                  <option value="namorado">Namorado</option>
+                  <option value="pai">Pai / Padrasto</option>
+                  <option value="irmao">Irmão / Familiar</option>
+                </select>
+              </div>
+              <div class="field"><label>Mora no mesmo domicílio?</label><select id="a-domicilio" onchange="calcRisco()"><option value="">Selecione</option><option value="sim">Sim</option><option value="nao">Não</option></select></div>
+              <div class="field span2">
+                <label>Fatores de risco identificados</label>
+                <div class="check-row">
+                  <label class="check-item" onclick="toggleCheck(this,'a-arma')"><input type="checkbox" id="a-arma"><span class="box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Possui arma</label>
+                  <label class="check-item" onclick="toggleCheck(this,'a-ameaca')"><input type="checkbox" id="a-ameaca"><span class="box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Ameaça de morte</label>
+                  <label class="check-item" onclick="toggleCheck(this,'a-drogas')"><input type="checkbox" id="a-drogas"><span class="box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Drogas / Álcool</label>
+                  <label class="check-item" onclick="toggleCheck(this,'a-historico')"><input type="checkbox" id="a-historico"><span class="box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Histórico criminal</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-head">
+              <div class="section-icon si-gold"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+              <div class="section-head-text"><h3>Dados da Ocorrência</h3><p>Detalhes do episódio</p></div>
+            </div>
+            <div class="fields-grid g2">
+              <div class="field"><label>Natureza <span class="req">*</span></label><select id="o-natureza" onchange="calcRisco()"><option value="">Selecione</option><option value="ameaca-morte">Ameaça de morte</option><option value="lesao-grave">Lesão corporal grave</option><option value="psicologica">Violência psicológica</option></select></div>
+              <div class="field"><label>Data/Hora <span class="req">*</span></label><input type="datetime-local" id="o-data"></div>
+              <div class="field span2"><label>Descrição</label><textarea id="o-descricao" placeholder="Relato livre..."></textarea></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="risk-panel">
+          <div class="risk-panel-title">⚡ Avaliação de Risco</div>
+          <div class="risk-meter">
+            <div class="risk-score-row"><div class="risk-score" id="risk-score">0</div><div style="font-size:0.8rem; color:var(--muted); margin-bottom: 0.3rem">/ 310 pts</div></div>
+            <div class="risk-bar-track"><div class="risk-bar-fill" id="risk-bar"></div></div>
+            <span class="risk-label rl-baixo" id="risk-label">Baixo</span>
+          </div>
+          <div class="risk-factors" id="factors-list" style="margin-top:1.5rem">
+            <div class="no-factors">Nenhum fator detectado.</div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-secondary" onclick="location.reload()">Limpar</button>
+            <button class="btn-primary" onclick="salvarCaso()">Salvar Caso</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const PESOS = {
+    ameacaMorte: 40, arma: 35, lesaoGrave: 30, exConjuge: 30, mesmoDomicilio: 25, 
+    conjuge: 25, namorado: 20, pai: 20, drogas: 15, filhosmenores: 10, semApoio: 10, semPanico: 10
+  };
+  const TOTAL_MAX = 310;
+
+  function val(id) { return document.getElementById(id).value; }
+  function chk(id) { return document.getElementById(id).checked; }
+
+  function maskCPF(i) {
+    let v = i.value.replace(/\D/g, '');
+    v = v.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    i.value = v;
+  }
+
+  function maskTel(i) {
+    let v = i.value.replace(/\D/g, '');
+    v = v.replace(/^(\d{2})(\d)/g, "($1) $2").replace(/(\d{5})(\d)/, "$1-$2");
+    i.value = v;
+  }
+
+  function toggleCheck(el, id) {
+    const input = document.getElementById(id);
+    input.checked = !input.checked;
+    el.classList.toggle('checked', input.checked);
+    calcRisco();
+  }
+
+  function calcRisco() {
+    let pts = 0; let fatores = [];
+    const p = val('a-parentesco');
+    if(p==='ex-conjuge'){ pts+=PESOS.exConjuge; fatores.push(['Ex-cônjuge', PESOS.exConjuge]); }
+    if(p==='conjuge'){ pts+=PESOS.conjuge; fatores.push(['Cônjuge', PESOS.conjuge]); }
+    if(val('a-domicilio')==='sim'){ pts+=PESOS.mesmoDomicilio; fatores.push(['Mora junto', PESOS.mesmoDomicilio]); }
+    if(chk('a-arma')){ pts+=PESOS.arma; fatores.push(['Possui arma', PESOS.arma]); }
+    if(chk('a-ameaca') || val('o-natureza')==='ameaca-morte'){ pts+=PESOS.ameacaMorte; fatores.push(['Ameaça de morte', PESOS.ameacaMorte]); }
+    if(val('o-natureza')==='lesao-grave'){ pts+=PESOS.lesaoGrave; fatores.push(['Lesão Grave', PESOS.lesaoGrave]); }
+    if(val('v-panico')==='nao'){ pts+=PESOS.semPanico; fatores.push(['Sem botão pânico', PESOS.semPanico]); }
+    if(val('v-apoio')==='nao'){ pts+=PESOS.semApoio; fatores.push(['Sem rede apoio', PESOS.semApoio]); }
+    if(chk('v-filhos')){ pts+=PESOS.filhosmenores; fatores.push(['Filhos menores', PESOS.filhosmenores]); }
+
+    document.getElementById('risk-score').innerText = pts;
+    const bar = document.getElementById('risk-bar');
+    const lbl = document.getElementById('risk-label');
+    bar.style.width = Math.min((pts/TOTAL_MAX)*100, 100) + '%';
+    
+    lbl.className = 'risk-label';
+    if(pts<=50){ lbl.innerText='Baixo'; lbl.classList.add('rl-baixo'); bar.style.background='var(--green-l)'; }
+    else if(pts<=120){ lbl.innerText='Médio'; lbl.classList.add('rl-medio'); bar.style.background='var(--teal-l)'; }
+    else if(pts<=200){ lbl.innerText='Alto'; lbl.classList.add('rl-alto'); bar.style.background='var(--gold-l)'; }
+    else { lbl.innerText='Crítico'; lbl.classList.add('rl-critico'); bar.style.background='var(--rose-l)'; }
+
+    const list = document.getElementById('factors-list');
+    list.innerHTML = fatores.length ? fatores.map(f => `<div class="factor-item"><span>${f[0]}</span><span class="factor-pts">+${f[1]}</span></div>`).join('') : '<div class="no-factors">Nenhum fator.</div>';
+  }
+
+  function salvarCaso() {
+    if(!val('v-nome') || !val('v-cpf') || !val('o-data')) return alert("Preencha os campos obrigatórios!");
+    const caso = {
+      id: "DDM-" + Date.now().toString().slice(-6),
+      vitima: val('v-nome'), cpf: val('v-cpf'),
+      agressor: val('a-nome') || "Não identificado",
+      data: val('o-data'), status: "Ativo",
+      risco: document.getElementById('risk-score').innerText
+    };
+    let casos = JSON.parse(localStorage.getItem("casos")) || [];
+    casos.push(caso);
+    localStorage.setItem("casos", JSON.stringify(casos));
+    alert("Caso salvo!");
+    window.location.href = "busca.html";
+  }
+</script>
+</body>
+</html>

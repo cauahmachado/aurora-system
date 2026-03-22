@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DDM — Detalhes da Ocorrência</title>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #0d1b2a; --navy2: #111f30; --teal-l: #22919a;
+      --rose: #c0364a; --rose-l: #e04d62; --text: #e8e2da; 
+      --muted: #7a93a8; --line: rgba(255,255,255,0.07);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--text); padding: 2rem; line-height: 1.5; }
+    .container { max-width: 650px; margin: 0 auto; }
+    
+    .card { background: var(--navy2); border: 1px solid var(--line); padding: 2rem; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    
+    .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    h2 { font-family: 'Crimson Pro', serif; color: var(--teal-l); margin: 0; font-size: 1.8rem; }
+
+    .status-tag { padding: 5px 14px; border-radius: 100px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .status-ativo { background: rgba(34, 145, 154, 0.15); color: var(--teal-l); border: 1px solid var(--teal-l); }
+    .status-concluido { background: rgba(192, 54, 74, 0.15); color: var(--rose-l); border: 1px solid var(--rose-l); }
+
+    .info-grid { display: grid; gap: 1.2rem; }
+    .info-row { border-bottom: 1px solid var(--line); padding-bottom: 0.6rem; }
+    .label { font-size: 0.65rem; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; display: block; margin-bottom: 4px; }
+    .value { font-size: 1rem; font-weight: 500; color: #fff; }
+    
+    .btn-encerrar { 
+      width: 100%; padding: 14px; margin-top: 2rem; background: var(--rose); color: white; 
+      border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s;
+    }
+    .btn-encerrar:hover { background: var(--rose-l); transform: translateY(-1px); }
+    
+    .back-btn { background: none; border: 1px solid var(--line); color: var(--muted); padding: 8px 16px; border-radius: 8px; cursor: pointer; margin-bottom: 1.5rem; transition: 0.2s; }
+    .back-btn:hover { color: #fff; border-color: var(--teal-l); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <button class="back-btn" onclick="window.location.href='busca.html'">← Voltar para Busca</button>
+  
+  <div class="card" id="detalhesConteudo">
+    </div>
+</div>
+
+<script>
+  function renderizar() {
+    const caso = JSON.parse(localStorage.getItem("casoSelecionado"));
+    const container = document.getElementById("detalhesConteudo");
+
+    if (!caso) {
+      container.innerHTML = `<p>Erro: Caso não encontrado.</p>`;
+      return;
+    }
+
+    let dataExibicao = "Não informada";
+    if (caso.data) {
+      const [data, hora] = caso.data.split("T");
+      const [ano, mes, dia] = data.split("-");
+      dataExibicao = `${dia}/${mes}/${ano}` + (hora ? ` às ${hora}` : "");
+    }
+
+    const isConcluido = caso.status === "Concluído";
+
+    container.innerHTML = `
+      <div class="header-row">
+        <h2>Detalhes da Ocorrência</h2>
+        <span class="status-tag ${isConcluido ? 'status-concluido' : 'status-ativo'}">
+          ${caso.status || 'Ativo'}
+        </span>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-row">
+          <span class="label">ID do Protocolo</span>
+          <span class="value" style="color:var(--teal-l)">${caso.id}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Vítima (Nome Completo)</span>
+          <span class="value">${caso.vitima}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">CPF da Vítima</span>
+          <span class="value">${caso.cpf || 'Não registrado'}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Agressor</span>
+          <span class="value">${caso.agressor || 'Não identificado'}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Data do Registro</span>
+          <span class="value">${dataExibicao}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Natureza da Ocorrência</span>
+          <span class="value">${caso.natureza}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Grau de Risco Calculado</span>
+          <span class="value">${caso.risco || '0'} pontos</span>
+        </div>
+      </div>
+
+      ${!isConcluido ? `
+        <button class="btn-encerrar" onclick="finalizarCaso('${caso.id}')">
+          Encerrar e Arquivar Caso
+        </button>
+      ` : ''}
+    `;
+  }
+
+  function finalizarCaso(id) {
+    if (!confirm("Confirmar encerramento desta ocorrência?")) return;
+
+    let casos = JSON.parse(localStorage.getItem("casos")) || [];
+    casos = casos.map(c => {
+      if (c.id === id) c.status = "Concluído";
+      return c;
+    });
+    localStorage.setItem("casos", JSON.stringify(casos));
+
+    const casoAtual = JSON.parse(localStorage.getItem("casoSelecionado"));
+    casoAtual.status = "Concluído";
+    localStorage.setItem("casoSelecionado", JSON.stringify(casoAtual));
+
+    renderizar();
+  }
+
+  renderizar();
+</script>
+
+</body>
+</html>
