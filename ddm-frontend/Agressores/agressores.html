@@ -1,337 +1,939 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DDM Zona Sul — Agressores</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     :root {
-      --navy:    #0d1b2a;
-      --navy2:   #111f30;
-      --navy3:   #162840;
-      --teal:    #1a6b72;
-      --teal-l:  #22919a;
-      --rose:    #c0364a;
-      --rose-l:  #e04d62;
-      --gold:    #c9a84c;
-      --gold-l:  #e0bc6a;
-      --green:   #2a7d4f;
+      --navy: #0d1b2a;
+      --navy2: #111f30;
+      --navy3: #162840;
+      --teal: #1a6b72;
+      --teal-l: #22919a;
+      --rose: #c0364a;
+      --rose-l: #e04d62;
+      --gold: #c9a84c;
+      --gold-l: #e0bc6a;
+      --green: #2a7d4f;
       --green-l: #35a066;
-      --text:    #e8e2da;
-      --muted:   #7a93a8;
-      --line:    rgba(255,255,255,0.07);
+      --text: #e8e2da;
+      --muted: #7a93a8;
+      --line: rgba(255, 255, 255, 0.07);
       --sidebar: 230px;
     }
 
-    html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--text); overflow: hidden; }
-    .app { display: flex; height: 100vh; }
+    html,
+    body {
+      height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .app {
+      display: flex;
+      height: 100vh;
+    }
 
     /* ══ SIDEBAR ══ */
-    .sidebar { width: var(--sidebar); min-width: var(--sidebar); background: var(--navy2); border-right: 1px solid var(--line); display: flex; flex-direction: column; z-index: 10; }
-    .sidebar-brand { padding: 1.4rem 1.2rem 1.2rem; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: .8rem; }
-    .brand-icon { width: 36px; height: 36px; flex-shrink: 0; background: linear-gradient(135deg, var(--teal), var(--teal-l)); border-radius: 8px; display: grid; place-items: center; box-shadow: 0 0 18px rgba(26,107,114,.4); }
-    .brand-icon svg { width: 18px; height: 18px; fill: #fff; }
-    .brand-label { font-size: .78rem; font-weight: 600; color: #fff; line-height: 1.3; }
-    .brand-label span { display: block; font-size: .68rem; font-weight: 400; color: var(--muted); }
-    .nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
-    .nav-section { font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: .8rem 1.2rem .4rem; }
-    .nav-item { display: flex; align-items: center; gap: .75rem; padding: .65rem 1.2rem; cursor: pointer; border-left: 3px solid transparent; transition: all .2s; font-size: .87rem; color: var(--muted); user-select: none; text-decoration: none; }
-    .nav-item svg { width: 17px; height: 17px; stroke: currentColor; flex-shrink: 0; }
-    .nav-item:hover { background: rgba(255,255,255,.04); color: var(--text); }
-    .nav-item.active { background: rgba(26,107,114,.12); border-left-color: var(--teal-l); color: var(--teal-l); }
-    .nav-item .badge-count { margin-left: auto; background: var(--rose); color: #fff; font-size: .65rem; font-weight: 600; padding: .15rem .45rem; border-radius: 100px; }
-    .sidebar-user { padding: 1rem 1.2rem; border-top: 1px solid var(--line); display: flex; align-items: center; gap: .75rem; }
-    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--rose), var(--rose-l)); display: grid; place-items: center; font-size: .8rem; font-weight: 600; color: #fff; flex-shrink: 0; }
-    .user-info { flex: 1; min-width: 0; }
-    .user-name { font-size: .82rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .user-role { font-size: .7rem; color: var(--muted); }
-    .logout-btn { background: none; border: none; cursor: pointer; color: var(--muted); padding: .3rem; transition: color .2s; }
-    .logout-btn:hover { color: var(--rose-l); }
-    .logout-btn svg { width: 16px; height: 16px; stroke: currentColor; display: block; }
+    .sidebar {
+      width: var(--sidebar);
+      min-width: var(--sidebar);
+      background: var(--navy2);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    .sidebar-brand {
+      padding: 1.4rem 1.2rem 1.2rem;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--teal), var(--teal-l));
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 18px rgba(26, 107, 114, .4);
+    }
+
+    .brand-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: #fff;
+    }
+
+    .brand-label {
+      font-size: .78rem;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.3;
+    }
+
+    .brand-label span {
+      display: block;
+      font-size: .68rem;
+      font-weight: 400;
+      color: var(--muted);
+    }
+
+    .nav {
+      flex: 1;
+      padding: 1rem 0;
+      overflow-y: auto;
+    }
+
+    .nav-section {
+      font-size: .65rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      padding: .8rem 1.2rem .4rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .65rem 1.2rem;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all .2s;
+      font-size: .87rem;
+      color: var(--muted);
+      user-select: none;
+      text-decoration: none;
+    }
+
+    .nav-item svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      flex-shrink: 0;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, .04);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background: rgba(26, 107, 114, .12);
+      border-left-color: var(--teal-l);
+      color: var(--teal-l);
+    }
+
+    .nav-item .badge-count {
+      margin-left: auto;
+      background: var(--rose);
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 600;
+      padding: .15rem .45rem;
+      border-radius: 100px;
+    }
+
+    .sidebar-user {
+      padding: 1rem 1.2rem;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--rose), var(--rose-l));
+      display: grid;
+      place-items: center;
+      font-size: .8rem;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role {
+      font-size: .7rem;
+      color: var(--muted);
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      padding: .3rem;
+      transition: color .2s;
+    }
+
+    .logout-btn:hover {
+      color: var(--rose-l);
+    }
+
+    .logout-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      display: block;
+    }
 
     /* ══ MAIN ══ */
-    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .topbar { padding: 1.1rem 2rem; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-    .topbar-title { font-family: 'Crimson Pro', serif; font-size: 1.4rem; font-weight: 600; color: #fff; }
-    .topbar-sub { font-size: .78rem; color: var(--muted); margin-top: .1rem; }
-    .btn-new { display: flex; align-items: center; gap: .5rem; background: linear-gradient(135deg, var(--teal), var(--teal-l)); border: none; border-radius: 9px; padding: .6rem 1.1rem; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 600; cursor: pointer; transition: opacity .2s, transform .15s; box-shadow: 0 4px 14px rgba(26,107,114,.35); }
-    .btn-new:hover { opacity: .9; transform: translateY(-1px); }
-    .btn-new svg { width: 15px; height: 15px; stroke: #fff; }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      padding: 1.1rem 2rem;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .topbar-title {
+      font-family: 'Crimson Pro', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .topbar-sub {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-top: .1rem;
+    }
+
+    .btn-new {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      background: linear-gradient(135deg, var(--teal), var(--teal-l));
+      border: none;
+      border-radius: 9px;
+      padding: .6rem 1.1rem;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .2s, transform .15s;
+      box-shadow: 0 4px 14px rgba(26, 107, 114, .35);
+    }
+
+    .btn-new:hover {
+      opacity: .9;
+      transform: translateY(-1px);
+    }
+
+    .btn-new svg {
+      width: 15px;
+      height: 15px;
+      stroke: #fff;
+    }
 
     /* ══ CONTENT ══ */
-    .content { flex: 1; overflow-y: auto; padding: 1.6rem 2rem; }
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.6rem 2rem;
+    }
 
-    .filters { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.4rem; flex-wrap: wrap; animation: fadeUp .4s ease both; }
-    .search-wrap { position: relative; flex: 1; min-width: 220px; }
-    .search-wrap svg { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; stroke: var(--muted); pointer-events: none; }
-    .search-input { width: 100%; padding: .65rem .9rem .65rem 2.3rem; background: var(--navy2); border: 1px solid var(--line); border-radius: 9px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .85rem; outline: none; transition: border-color .2s; }
-    .search-input::placeholder { color: var(--muted); }
-    .search-input:focus { border-color: var(--teal-l); }
-    .filter-select { padding: .65rem 1rem; background: var(--navy2); border: 1px solid var(--line); border-radius: 9px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .85rem; outline: none; cursor: pointer; transition: border-color .2s; }
-    .filter-select:focus { border-color: var(--teal-l); }
-    .filter-select option { background: var(--navy2); }
-    .filter-count { font-size: .8rem; color: var(--muted); margin-left: auto; white-space: nowrap; }
-    .filter-count span { color: #fff; font-weight: 600; }
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      margin-bottom: 1.4rem;
+      flex-wrap: wrap;
+      animation: fadeUp .4s ease both;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: .85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 15px;
+      stroke: var(--muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: .65rem .9rem .65rem 2.3rem;
+      background: var(--navy2);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .85rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .search-input::placeholder {
+      color: var(--muted);
+    }
+
+    .search-input:focus {
+      border-color: var(--teal-l);
+    }
+
+    .filter-select {
+      padding: .65rem 1rem;
+      background: var(--navy2);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .85rem;
+      outline: none;
+      cursor: pointer;
+      transition: border-color .2s;
+    }
+
+    .filter-select:focus {
+      border-color: var(--teal-l);
+    }
+
+    .filter-select option {
+      background: var(--navy2);
+    }
+
+    .filter-count {
+      font-size: .8rem;
+      color: var(--muted);
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    .filter-count span {
+      color: #fff;
+      font-weight: 600;
+    }
 
     /* tabela */
-    .table-wrap { background: var(--navy2); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; animation: fadeUp .4s .1s ease both; }
-    table { width: 100%; border-collapse: collapse; }
-    thead tr { background: rgba(255,255,255,.02); }
-    th { padding: .85rem 1.1rem; text-align: left; font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--line); white-space: nowrap; }
-    td { padding: .9rem 1.1rem; font-size: .84rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
-    tbody tr:last-child td { border-bottom: none; }
-    tbody tr { transition: background .15s; }
-    tbody tr:hover td { background: rgba(255,255,255,.02); }
+    .table-wrap {
+      background: var(--navy2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      animation: fadeUp .4s .1s ease both;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      background: rgba(255, 255, 255, .02);
+    }
+
+    th {
+      padding: .85rem 1.1rem;
+      text-align: left;
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      font-weight: 500;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: .9rem 1.1rem;
+      font-size: .84rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr {
+      transition: background .15s;
+    }
+
+    tbody tr:hover td {
+      background: rgba(255, 255, 255, .02);
+    }
 
     /* linha com perigo — agressor com arma */
-    tbody tr.perigo td { border-left: 2px solid var(--rose); }
-    tbody tr.perigo td:first-child { border-left: 2px solid var(--rose); }
+    tbody tr.perigo td {
+      border-left: 2px solid var(--rose);
+    }
 
-    .agressor-name { font-weight: 500; color: #fff; }
-    .agressor-id   { font-size: .7rem; color: var(--muted); margin-top: .15rem; }
-    .cpf-text      { font-size: .8rem; color: var(--muted); font-family: monospace; letter-spacing: .03em; }
+    tbody tr.perigo td:first-child {
+      border-left: 2px solid var(--rose);
+    }
+
+    .agressor-name {
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .agressor-id {
+      font-size: .7rem;
+      color: var(--muted);
+      margin-top: .15rem;
+    }
+
+    .cpf-text {
+      font-size: .8rem;
+      color: var(--muted);
+      font-family: monospace;
+      letter-spacing: .03em;
+    }
 
     /* badges */
-    .badge-sim-perigo { display: inline-flex; align-items: center; gap: .35rem; padding: .22rem .65rem; border-radius: 100px; font-size: .7rem; font-weight: 600; background: rgba(192,54,74,.15); color: var(--rose-l); border: 1px solid rgba(192,54,74,.3); white-space: nowrap; }
-    .badge-nao        { display: inline-flex; align-items: center; gap: .35rem; padding: .22rem .65rem; border-radius: 100px; font-size: .7rem; font-weight: 600; background: rgba(255,255,255,.05); color: var(--muted); border: 1px solid var(--line); white-space: nowrap; }
-    .badge-historico  { display: inline-flex; align-items: center; gap: .35rem; padding: .22rem .65rem; border-radius: 100px; font-size: .7rem; font-weight: 600; background: rgba(201,168,76,.12); color: var(--gold-l); border: 1px solid rgba(201,168,76,.25); white-space: nowrap; }
+    .badge-sim-perigo {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .22rem .65rem;
+      border-radius: 100px;
+      font-size: .7rem;
+      font-weight: 600;
+      background: rgba(192, 54, 74, .15);
+      color: var(--rose-l);
+      border: 1px solid rgba(192, 54, 74, .3);
+      white-space: nowrap;
+    }
 
-    .parentesco-tag { font-size: .8rem; color: var(--text); }
+    .badge-nao {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .22rem .65rem;
+      border-radius: 100px;
+      font-size: .7rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, .05);
+      color: var(--muted);
+      border: 1px solid var(--line);
+      white-space: nowrap;
+    }
+
+    .badge-historico {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .22rem .65rem;
+      border-radius: 100px;
+      font-size: .7rem;
+      font-weight: 600;
+      background: rgba(201, 168, 76, .12);
+      color: var(--gold-l);
+      border: 1px solid rgba(201, 168, 76, .25);
+      white-space: nowrap;
+    }
+
+    .parentesco-tag {
+      font-size: .8rem;
+      color: var(--text);
+    }
 
     /* ações */
-    .actions { display: flex; align-items: center; gap: .4rem; }
-    .btn-action { width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--line); background: transparent; display: grid; place-items: center; cursor: pointer; transition: all .2s; color: var(--muted); }
-    .btn-action svg { width: 14px; height: 14px; stroke: currentColor; }
-    .btn-action:hover { background: rgba(255,255,255,.07); color: var(--text); }
-    .btn-action.danger:hover { background: rgba(192,54,74,.15); color: var(--rose-l); border-color: rgba(192,54,74,.3); }
-    .btn-action.view:hover   { background: rgba(26,107,114,.15); color: var(--teal-l); border-color: rgba(26,107,114,.3); }
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
 
-    .empty-state { padding: 3rem; text-align: center; color: var(--muted); font-size: .88rem; }
+    .btn-action {
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: transparent;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all .2s;
+      color: var(--muted);
+    }
+
+    .btn-action svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+    }
+
+    .btn-action:hover {
+      background: rgba(255, 255, 255, .07);
+      color: var(--text);
+    }
+
+    .btn-action.danger:hover {
+      background: rgba(192, 54, 74, .15);
+      color: var(--rose-l);
+      border-color: rgba(192, 54, 74, .3);
+    }
+
+    .btn-action.view:hover {
+      background: rgba(26, 107, 114, .15);
+      color: var(--teal-l);
+      border-color: rgba(26, 107, 114, .3);
+    }
+
+    .empty-state {
+      padding: 3rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: .88rem;
+    }
 
     /* paginação */
-    .pagination { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.1rem; border-top: 1px solid var(--line); font-size: .8rem; color: var(--muted); }
-    .page-btns { display: flex; gap: .4rem; }
-    .page-btn { width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: .8rem; cursor: pointer; transition: all .2s; display: grid; place-items: center; }
-    .page-btn:hover { background: rgba(255,255,255,.06); color: var(--text); }
-    .page-btn.active { background: var(--teal); border-color: var(--teal); color: #fff; }
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.1rem;
+      border-top: 1px solid var(--line);
+      font-size: .8rem;
+      color: var(--muted);
+    }
+
+    .page-btns {
+      display: flex;
+      gap: .4rem;
+    }
+
+    .page-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .8rem;
+      cursor: pointer;
+      transition: all .2s;
+      display: grid;
+      place-items: center;
+    }
+
+    .page-btn:hover {
+      background: rgba(255, 255, 255, .06);
+      color: var(--text);
+    }
+
+    .page-btn.active {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #fff;
+    }
 
     /* modal */
-    .modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.6); backdrop-filter: blur(4px); display: none; place-items: center; }
-    .modal-overlay.open { display: grid; }
-    .modal { background: var(--navy2); border: 1px solid var(--line); border-radius: 16px; padding: 2rem; max-width: 380px; width: 90%; animation: fadeUp .3s ease both; }
-    .modal-icon { width: 44px; height: 44px; border-radius: 10px; background: rgba(192,54,74,.15); display: grid; place-items: center; margin-bottom: 1rem; }
-    .modal-icon svg { width: 22px; height: 22px; stroke: var(--rose-l); }
-    .modal h3 { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: .4rem; }
-    .modal p { font-size: .83rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.4rem; }
-    .modal-btns { display: flex; gap: .7rem; }
-    .modal-btns button { flex: 1; padding: .7rem; border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 600; cursor: pointer; transition: all .2s; }
-    .btn-cancel { background: transparent; border: 1px solid var(--line); color: var(--muted); }
-    .btn-cancel:hover { background: rgba(255,255,255,.05); color: var(--text); }
-    .btn-confirm-delete { background: var(--rose); border: none; color: #fff; }
-    .btn-confirm-delete:hover { background: var(--rose-l); }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, .6);
+      backdrop-filter: blur(4px);
+      display: none;
+      place-items: center;
+    }
 
-    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 10px; }
+    .modal-overlay.open {
+      display: grid;
+    }
+
+    .modal {
+      background: var(--navy2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 380px;
+      width: 90%;
+      animation: fadeUp .3s ease both;
+    }
+
+    .modal-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(192, 54, 74, .15);
+      display: grid;
+      place-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .modal-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--rose-l);
+    }
+
+    .modal h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: .4rem;
+    }
+
+    .modal p {
+      font-size: .83rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 1.4rem;
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: .7rem;
+    }
+
+    .modal-btns button {
+      flex: 1;
+      padding: .7rem;
+      border-radius: 9px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .btn-cancel:hover {
+      background: rgba(255, 255, 255, .05);
+      color: var(--text);
+    }
+
+    .btn-confirm-delete {
+      background: var(--rose);
+      border: none;
+      color: #fff;
+    }
+
+    .btn-confirm-delete:hover {
+      background: var(--rose-l);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, .1);
+      border-radius: 10px;
+    }
   </style>
 </head>
+
 <body>
-<div class="app">
+  <div class="app">
 
-  <!-- ══ SIDEBAR ══ -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div>
-      <div class="brand-label">DDM Zona Sul <span>Sistema Interno</span></div>
-    </div>
-    <nav class="nav">
-      <div class="nav-section">Principal</div>
-
-      <a class="nav-item" href="../Dashboard/dashboard.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        Dashboard
-      </a>
-
-      <a class="nav-item" href="../Vitimas/vitimas.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Vítimas
-        <span class="badge-count">142</span>
-      </a>
-
-      <a class="nav-item active" href="../Agressores/agressores.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-        Agressores
-      </a>
-
-      <a class="nav-item" href="../NovasOcorrencias/nova-ocorrencia.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Ocorrências
-        <span class="badge-count">7</span>
-      </a>
-
-      <div class="nav-section">Análise</div>
-      
-      <a class="nav-item" href="#">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        Relatórios
-      </a>
-
-      <a class="nav-item" href="#">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        Buscar Caso
-      </a>
-    </nav>
-    <div class="sidebar-user">
-      <div class="user-avatar">DS</div>
-      <div class="user-info"><div class="user-name">Dra. Silva</div><div class="user-role">Delegada</div></div>
-      <button class="logout-btn" onclick="window.location.href='../Login/login.html'">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      </button>
-    </div>
-  </aside>
-
-  <!-- ══ MAIN ══ -->
-  <div class="main">
-    <div class="topbar">
-      <div>
-        <div class="topbar-title">Agressores</div>
-        <div class="topbar-sub">Cadastros registrados no sistema</div>
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon"><svg viewBox="0 0 24 24">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
+          </svg></div>
+        <div class="brand-label">DDM Zona Sul <span>Sistema Interno</span></div>
       </div>
-      <button class="btn-new" onclick="window.location.href='../NovasOcorrencias/nova-ocorrencia.html'">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Nova Ocorrência
-      </button>
-    </div>
+      <nav class="nav">
+        <div class="nav-section">Principal</div>
 
-    <div class="content">
+        <a class="nav-item" href="../Dashboard/dashboard.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+          </svg>
+          Dashboard
+        </a>
 
-      <div class="filters">
-        <div class="search-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input class="search-input" type="text" placeholder="Buscar por nome ou CPF..." oninput="filtrar()" id="search" />
+        <a class="nav-item" href="../Vitimas/vitimas.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          Vítimas
+          <span class="badge-count">142</span>
+        </a>
+
+        <a class="nav-item active" href="../Agressores/agressores.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <line x1="19" y1="8" x2="19" y2="14" />
+            <line x1="22" y1="11" x2="16" y2="11" />
+          </svg>
+          Agressores
+        </a>
+
+        <a class="nav-item" href="../NovasOcorrencias/nova-ocorrencia.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          Ocorrências
+          <span class="badge-count">7</span>
+        </a>
+
+        <div class="nav-section">Análise</div>
+
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10" />
+            <line x1="12" y1="20" x2="12" y2="4" />
+            <line x1="6" y1="20" x2="6" y2="14" />
+          </svg>
+          Relatórios
+        </a>
+
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          Buscar Caso
+        </a>
+      </nav>
+      <div class="sidebar-user">
+        <div class="user-avatar">DS</div>
+        <div class="user-info">
+          <div class="user-name">Dra. Silva</div>
+          <div class="user-role">Delegada</div>
         </div>
-        <select class="filter-select" onchange="filtrar()" id="filtro-parentesco">
-          <option value="">Todos os vínculos</option>
-          <option value="Ex-cônjuge">Ex-cônjuge</option>
-          <option value="Cônjuge">Cônjuge</option>
-          <option value="Companheiro">Companheiro</option>
-          <option value="Namorado">Namorado</option>
-          <option value="Pai/Padrasto">Pai/Padrasto</option>
-          <option value="Outro">Outro</option>
-        </select>
-        <select class="filter-select" onchange="filtrar()" id="filtro-arma">
-          <option value="">Posse de arma</option>
-          <option value="Sim">Com arma</option>
-          <option value="Não">Sem arma</option>
-        </select>
-        <select class="filter-select" onchange="filtrar()" id="filtro-historico">
-          <option value="">Histórico</option>
-          <option value="Sim">Com histórico</option>
-          <option value="Não">Sem histórico</option>
-        </select>
-        <div class="filter-count">Exibindo <span id="count">10</span> de <span id="total">10</span></div>
+        <button class="logout-btn" onclick="window.location.href='../Login/login.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        </button>
       </div>
+    </aside>
 
-      <div class="table-wrap">
-        <table id="tabela">
-          <thead>
-            <tr>
-              <th>Agressor</th>
-              <th>CPF</th>
-              <th>Vínculo</th>
-              <th>Drogas/Álcool</th>
-              <th>Arma</th>
-              <th>Histórico</th>
-              <th>Região</th>
-              <th>Registro</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-        <div class="empty-state" id="empty" style="display:none">Nenhum agressor encontrado com os filtros aplicados.</div>
-        <div class="pagination">
-          <span id="pag-info">Página 1 de 1</span>
-          <div class="page-btns" id="page-btns"></div>
+    <!-- ══ MAIN ══ -->
+    <div class="main">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Agressores</div>
+          <div class="topbar-sub">Cadastros registrados no sistema</div>
         </div>
+        <button class="btn-new" onclick="window.location.href='../NovasOcorrencias/nova-ocorrencia.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Nova Ocorrência
+        </button>
       </div>
 
+      <div class="content">
+
+        <div class="filters">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input class="search-input" type="text" placeholder="Buscar por nome ou CPF..." oninput="filtrar()"
+              id="search" />
+          </div>
+          <select class="filter-select" onchange="filtrar()" id="filtro-parentesco">
+            <option value="">Todos os vínculos</option>
+            <option value="Ex-cônjuge">Ex-cônjuge</option>
+            <option value="Cônjuge">Cônjuge</option>
+            <option value="Companheiro">Companheiro</option>
+            <option value="Namorado">Namorado</option>
+            <option value="Pai/Padrasto">Pai/Padrasto</option>
+            <option value="Outro">Outro</option>
+          </select>
+          <select class="filter-select" onchange="filtrar()" id="filtro-arma">
+            <option value="">Posse de arma</option>
+            <option value="Sim">Com arma</option>
+            <option value="Não">Sem arma</option>
+          </select>
+          <select class="filter-select" onchange="filtrar()" id="filtro-historico">
+            <option value="">Histórico</option>
+            <option value="Sim">Com histórico</option>
+            <option value="Não">Sem histórico</option>
+          </select>
+          <div class="filter-count">Exibindo <span id="count">10</span> de <span id="total">10</span></div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="tabela">
+            <thead>
+              <tr>
+                <th>Agressor</th>
+                <th>CPF</th>
+                <th>Vínculo</th>
+                <th>Drogas/Álcool</th>
+                <th>Arma</th>
+                <th>Histórico</th>
+                <th>Região</th>
+                <th>Registro</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+          <div class="empty-state" id="empty" style="display:none">Nenhum agressor encontrado com os filtros aplicados.
+          </div>
+          <div class="pagination">
+            <span id="pag-info">Página 1 de 1</span>
+            <div class="page-btns" id="page-btns"></div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
-</div>
 
-<!-- modal exclusão -->
-<div class="modal-overlay" id="modal-exclusao">
-  <div class="modal">
-    <div class="modal-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-    </div>
-    <h3>Excluir cadastro</h3>
-    <p>Tem certeza que deseja excluir este cadastro? Esta ação não pode ser desfeita.</p>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
-      <button class="btn-confirm-delete" onclick="confirmarExclusao()">Excluir</button>
+  <!-- modal exclusão -->
+  <div class="modal-overlay" id="modal-exclusao">
+    <div class="modal">
+      <div class="modal-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+          <path d="M10 11v6" />
+          <path d="M14 11v6" />
+          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+        </svg>
+      </div>
+      <h3>Excluir cadastro</h3>
+      <p>Tem certeza que deseja excluir este cadastro? Esta ação não pode ser desfeita.</p>
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-confirm-delete" onclick="confirmarExclusao()">Excluir</button>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-  // ── DADOS MOCK ──
-  const AGRESSORES = [
-    { id:'#2024-0318', nome:'José A. Rocha',      cpf:'***.111.222-**', vinculo:'Ex-cônjuge',   drogas:'Sim', arma:'Sim', historico:'Sim', regiao:'Jd. Ângela',    data:'18/03/2024' },
-    { id:'#2024-0301', nome:'Ricardo F. Melo',    cpf:'***.333.444-**', vinculo:'Ex-cônjuge',   drogas:'Sim', arma:'Não', historico:'Sim', regiao:'Capão Redondo', data:'01/03/2024' },
-    { id:'#2024-0287', nome:'Carlos O. Silva',    cpf:'***.555.666-**', vinculo:'Pai/Padrasto',  drogas:'Não', arma:'Sim', historico:'Não', regiao:'Campo Limpo',   data:'15/02/2024' },
-    { id:'#2024-0265', nome:'Marcos T. Braga',    cpf:'***.777.888-**', vinculo:'Cônjuge',       drogas:'Sim', arma:'Não', historico:'Sim', regiao:'Grajaú',        data:'28/01/2024' },
-    { id:'#2024-0244', nome:'Felipe P. Lopes',    cpf:'***.999.000-**', vinculo:'Namorado',      drogas:'Não', arma:'Não', historico:'Não', regiao:'Jd. São Luís',  data:'10/01/2024' },
-    { id:'#2024-0231', nome:'André M. Souza',     cpf:'***.112.334-**', vinculo:'Companheiro',   drogas:'Sim', arma:'Não', historico:'Não', regiao:'Socorro',       data:'05/01/2024' },
-    { id:'#2024-0218', nome:'Bruno A. Nunes',     cpf:'***.556.778-**', vinculo:'Ex-cônjuge',   drogas:'Não', arma:'Não', historico:'Sim', regiao:'Interlagos',    data:'02/01/2024' },
-    { id:'#2023-0412', nome:'Diego P. Faria',     cpf:'***.990.112-**', vinculo:'Namorado',      drogas:'Não', arma:'Não', historico:'Não', regiao:'Pedreira',      data:'20/12/2023' },
-    { id:'#2023-0398', nome:'Leandro N. Castro',  cpf:'***.334.556-**', vinculo:'Cônjuge',       drogas:'Sim', arma:'Sim', historico:'Sim', regiao:'Cidade Ademar', data:'12/12/2023' },
-    { id:'#2023-0371', nome:'Sandro G. Lima',     cpf:'***.778.990-**', vinculo:'Outro',         drogas:'Não', arma:'Não', historico:'Não', regiao:"M'Boi Mirim",   data:'01/12/2023' },
-  ];
+  <script>
+    // ── DADOS MOCK ──
+    const AGRESSORES = [
+      { id: '#2024-0318', nome: 'José A. Rocha', cpf: '***.111.222-**', vinculo: 'Ex-cônjuge', drogas: 'Sim', arma: 'Sim', historico: 'Sim', regiao: 'Jd. Ângela', data: '18/03/2024' },
+      { id: '#2024-0301', nome: 'Ricardo F. Melo', cpf: '***.333.444-**', vinculo: 'Ex-cônjuge', drogas: 'Sim', arma: 'Não', historico: 'Sim', regiao: 'Capão Redondo', data: '01/03/2024' },
+      { id: '#2024-0287', nome: 'Carlos O. Silva', cpf: '***.555.666-**', vinculo: 'Pai/Padrasto', drogas: 'Não', arma: 'Sim', historico: 'Não', regiao: 'Campo Limpo', data: '15/02/2024' },
+      { id: '#2024-0265', nome: 'Marcos T. Braga', cpf: '***.777.888-**', vinculo: 'Cônjuge', drogas: 'Sim', arma: 'Não', historico: 'Sim', regiao: 'Grajaú', data: '28/01/2024' },
+      { id: '#2024-0244', nome: 'Felipe P. Lopes', cpf: '***.999.000-**', vinculo: 'Namorado', drogas: 'Não', arma: 'Não', historico: 'Não', regiao: 'Jd. São Luís', data: '10/01/2024' },
+      { id: '#2024-0231', nome: 'André M. Souza', cpf: '***.112.334-**', vinculo: 'Companheiro', drogas: 'Sim', arma: 'Não', historico: 'Não', regiao: 'Socorro', data: '05/01/2024' },
+      { id: '#2024-0218', nome: 'Bruno A. Nunes', cpf: '***.556.778-**', vinculo: 'Ex-cônjuge', drogas: 'Não', arma: 'Não', historico: 'Sim', regiao: 'Interlagos', data: '02/01/2024' },
+      { id: '#2023-0412', nome: 'Diego P. Faria', cpf: '***.990.112-**', vinculo: 'Namorado', drogas: 'Não', arma: 'Não', historico: 'Não', regiao: 'Pedreira', data: '20/12/2023' },
+      { id: '#2023-0398', nome: 'Leandro N. Castro', cpf: '***.334.556-**', vinculo: 'Cônjuge', drogas: 'Sim', arma: 'Sim', historico: 'Sim', regiao: 'Cidade Ademar', data: '12/12/2023' },
+      { id: '#2023-0371', nome: 'Sandro G. Lima', cpf: '***.778.990-**', vinculo: 'Outro', drogas: 'Não', arma: 'Não', historico: 'Não', regiao: "M'Boi Mirim", data: '01/12/2023' },
+    ];
 
-  const POR_PAGINA = 8;
-  let paginaAtual = 1;
-  let dadosFiltrados = [...AGRESSORES];
-  let idParaExcluir = null;
+    const POR_PAGINA = 8;
+    let paginaAtual = 1;
+    let dadosFiltrados = [...AGRESSORES];
+    let idParaExcluir = null;
 
-  function badgeSim(label) {
-    return `<span class="badge-sim-perigo">⚠ ${label}</span>`;
-  }
-  function badgeNao(label) {
-    return `<span class="badge-nao">${label}</span>`;
-  }
-  function badgeHistorico() {
-    return `<span class="badge-historico">📋 Sim</span>`;
-  }
+    function badgeSim(label) {
+      return `<span class="badge-sim-perigo">⚠ ${label}</span>`;
+    }
+    function badgeNao(label) {
+      return `<span class="badge-nao">${label}</span>`;
+    }
+    function badgeHistorico() {
+      return `<span class="badge-historico">📋 Sim</span>`;
+    }
 
-  function renderTabela() {
-    const tbody = document.getElementById('tbody');
-    const empty = document.getElementById('empty');
-    const count = document.getElementById('count');
-    const total = document.getElementById('total');
+    function renderTabela() {
+      const tbody = document.getElementById('tbody');
+      const empty = document.getElementById('empty');
+      const count = document.getElementById('count');
+      const total = document.getElementById('total');
 
-    const inicio = (paginaAtual - 1) * POR_PAGINA;
-    const pagina = dadosFiltrados.slice(inicio, inicio + POR_PAGINA);
+      const inicio = (paginaAtual - 1) * POR_PAGINA;
+      const pagina = dadosFiltrados.slice(inicio, inicio + POR_PAGINA);
 
-    total.textContent = dadosFiltrados.length;
-    count.textContent = pagina.length;
+      total.textContent = dadosFiltrados.length;
+      count.textContent = pagina.length;
 
-    if (pagina.length === 0) {
-      tbody.innerHTML = '';
-      empty.style.display = 'block';
-    } else {
-      empty.style.display = 'none';
-      tbody.innerHTML = pagina.map(a => {
-        // linha vermelha se tem arma
-        const perigo = a.arma === 'Sim' ? 'perigo' : '';
-        return `
+      if (pagina.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+      } else {
+        empty.style.display = 'none';
+        tbody.innerHTML = pagina.map(a => {
+          // linha vermelha se tem arma
+          const perigo = a.arma === 'Sim' ? 'perigo' : '';
+          return `
           <tr class="${perigo}">
             <td>
               <div class="agressor-name">${a.nome}</div>
@@ -362,63 +964,64 @@
             </td>
           </tr>
         `;
-      }).join('');
+        }).join('');
+      }
+
+      renderPaginacao();
     }
 
-    renderPaginacao();
-  }
-
-  function renderPaginacao() {
-    const total = Math.ceil(dadosFiltrados.length / POR_PAGINA);
-    const info  = document.getElementById('pag-info');
-    const btns  = document.getElementById('page-btns');
-    info.textContent = `Página ${paginaAtual} de ${Math.max(total, 1)}`;
-    btns.innerHTML = '';
-    for (let i = 1; i <= total; i++) {
-      const b = document.createElement('button');
-      b.className = 'page-btn' + (i === paginaAtual ? ' active' : '');
-      b.textContent = i;
-      b.onclick = () => { paginaAtual = i; renderTabela(); };
-      btns.appendChild(b);
+    function renderPaginacao() {
+      const total = Math.ceil(dadosFiltrados.length / POR_PAGINA);
+      const info = document.getElementById('pag-info');
+      const btns = document.getElementById('page-btns');
+      info.textContent = `Página ${paginaAtual} de ${Math.max(total, 1)}`;
+      btns.innerHTML = '';
+      for (let i = 1; i <= total; i++) {
+        const b = document.createElement('button');
+        b.className = 'page-btn' + (i === paginaAtual ? ' active' : '');
+        b.textContent = i;
+        b.onclick = () => { paginaAtual = i; renderTabela(); };
+        btns.appendChild(b);
+      }
     }
-  }
 
-  function filtrar() {
-    const busca     = document.getElementById('search').value.toLowerCase();
-    const parentesc = document.getElementById('filtro-parentesco').value;
-    const arma      = document.getElementById('filtro-arma').value;
-    const historico = document.getElementById('filtro-historico').value;
+    function filtrar() {
+      const busca = document.getElementById('search').value.toLowerCase();
+      const parentesc = document.getElementById('filtro-parentesco').value;
+      const arma = document.getElementById('filtro-arma').value;
+      const historico = document.getElementById('filtro-historico').value;
 
-    dadosFiltrados = AGRESSORES.filter(a => {
-      const matchBusca     = a.nome.toLowerCase().includes(busca) || a.cpf.includes(busca);
-      const matchParentesc = !parentesc || a.vinculo === parentesc;
-      const matchArma      = !arma      || a.arma    === arma;
-      const matchHistorico = !historico || a.historico === historico;
-      return matchBusca && matchParentesc && matchArma && matchHistorico;
-    });
+      dadosFiltrados = AGRESSORES.filter(a => {
+        const matchBusca = a.nome.toLowerCase().includes(busca) || a.cpf.includes(busca);
+        const matchParentesc = !parentesc || a.vinculo === parentesc;
+        const matchArma = !arma || a.arma === arma;
+        const matchHistorico = !historico || a.historico === historico;
+        return matchBusca && matchParentesc && matchArma && matchHistorico;
+      });
 
-    paginaAtual = 1;
+      paginaAtual = 1;
+      renderTabela();
+    }
+
+    function verPerfil(id) { alert(`Ver perfil: ${id}\n\n(Abrirá a página de perfil do agressor)`); }
+    function editar(id) { alert(`Editar: ${id}\n\n(Abrirá o formulário de edição)`); }
+    function verOcorrencias(id) { alert(`Ocorrências: ${id}\n\n(Listará todas as ocorrências vinculadas)`); }
+
+    function abrirModal(id) {
+      idParaExcluir = id;
+      document.getElementById('modal-exclusao').classList.add('open');
+    }
+    function fecharModal() {
+      document.getElementById('modal-exclusao').classList.remove('open');
+      idParaExcluir = null;
+    }
+    function confirmarExclusao() {
+      alert(`Cadastro ${idParaExcluir} excluído!\n\n(Aqui será chamada a API Java)`);
+      fecharModal();
+    }
+
     renderTabela();
-  }
-
-  function verPerfil(id)      { alert(`Ver perfil: ${id}\n\n(Abrirá a página de perfil do agressor)`); }
-  function editar(id)         { alert(`Editar: ${id}\n\n(Abrirá o formulário de edição)`); }
-  function verOcorrencias(id) { alert(`Ocorrências: ${id}\n\n(Listará todas as ocorrências vinculadas)`); }
-
-  function abrirModal(id) {
-    idParaExcluir = id;
-    document.getElementById('modal-exclusao').classList.add('open');
-  }
-  function fecharModal() {
-    document.getElementById('modal-exclusao').classList.remove('open');
-    idParaExcluir = null;
-  }
-  function confirmarExclusao() {
-    alert(`Cadastro ${idParaExcluir} excluído!\n\n(Aqui será chamada a API Java)`);
-    fecharModal();
-  }
-
-  renderTabela();
-</script>
+  </script>
 </body>
+
 </html>
