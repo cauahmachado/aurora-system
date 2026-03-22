@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DDM Zona Sul — Nova Ocorrência</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0d1b2a;
+      --navy2:  #111f30;
+      --navy3:  #162840;
+      --teal:   #1a6b72;
+      --teal-l: #22919a;
+      --rose:   #c0364a;
+      --rose-l: #e04d62;
+      --gold:   #c9a84c;
+      --gold-l: #e0bc6a;
+      --green:  #2a7d4f;
+      --green-l:#35a066;
+      --text:   #e8e2da;
+      --muted:  #7a93a8;
+      --line:   rgba(255,255,255,0.07);
+      --sidebar:230px;
+    }
+
+    html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--text); }
+
+    /* ── LAYOUT ── */
+    .app { display: flex; min-height: 100vh; }
+
+    /* ══ SIDEBAR (igual ao dashboard) ══ */
+    .sidebar {
+      width: var(--sidebar); min-width: var(--sidebar);
+      background: var(--navy2); border-right: 1px solid var(--line);
+      display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh;
+    }
+    .sidebar-brand {
+      padding: 1.4rem 1.2rem 1.2rem; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .brand-icon {
+      width: 36px; height: 36px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--teal), var(--teal-l));
+      border-radius: 8px; display: grid; place-items: center;
+      box-shadow: 0 0 18px rgba(26,107,114,.4);
+    }
+    .brand-icon svg { width: 18px; height: 18px; fill: #fff; }
+    .brand-label { font-size: .78rem; font-weight: 600; color: #fff; line-height: 1.3; }
+    .brand-label span { display: block; font-size: .68rem; font-weight: 400; color: var(--muted); }
+    .nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
+    .nav-section { font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: .8rem 1.2rem .4rem; }
+    .nav-item {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .65rem 1.2rem; cursor: pointer;
+      border-left: 3px solid transparent; transition: all .2s;
+      font-size: .87rem; color: var(--muted); user-select: none;
+    }
+    .nav-item svg { width: 17px; height: 17px; stroke: currentColor; flex-shrink: 0; }
+    .nav-item:hover { background: rgba(255,255,255,.04); color: var(--text); }
+    .nav-item.active { background: rgba(26,107,114,.12); border-left-color: var(--teal-l); color: var(--teal-l); }
+    .nav-item .badge-count { margin-left: auto; background: var(--rose); color: #fff; font-size: .65rem; font-weight: 600; padding: .15rem .45rem; border-radius: 100px; }
+    .sidebar-user { padding: 1rem 1.2rem; border-top: 1px solid var(--line); display: flex; align-items: center; gap: .75rem; }
+    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--rose), var(--rose-l)); display: grid; place-items: center; font-size: .8rem; font-weight: 600; color: #fff; flex-shrink: 0; }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: .82rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-role { font-size: .7rem; color: var(--muted); }
+    .logout-btn { background: none; border: none; cursor: pointer; color: var(--muted); padding: .3rem; transition: color .2s; }
+    .logout-btn:hover { color: var(--rose-l); }
+    .logout-btn svg { width: 16px; height: 16px; stroke: currentColor; display: block; }
+
+    /* ══ MAIN ══ */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar {
+      padding: 1.1rem 2rem; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .topbar-left { display: flex; align-items: center; gap: .8rem; }
+    .back-btn {
+      background: rgba(255,255,255,.05); border: 1px solid var(--line);
+      border-radius: 8px; padding: .4rem .8rem;
+      color: var(--muted); font-size: .8rem; cursor: pointer;
+      display: flex; align-items: center; gap: .4rem;
+      transition: all .2s; font-family: 'DM Sans', sans-serif;
+    }
+    .back-btn:hover { background: rgba(255,255,255,.09); color: var(--text); }
+    .back-btn svg { width: 14px; height: 14px; stroke: currentColor; }
+    .topbar-title { font-family: 'Crimson Pro', serif; font-size: 1.4rem; font-weight: 600; color: #fff; }
+
+    /* ══ CONTENT ══ */
+    .content { flex: 1; overflow-y: auto; padding: 2rem; }
+
+    .form-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    /* ══ SEÇÕES DO FORMULÁRIO ══ */
+    .form-section {
+      background: var(--navy2); border: 1px solid var(--line);
+      border-radius: 14px; padding: 1.6rem 1.8rem;
+      margin-bottom: 1.2rem;
+      animation: fadeUp .4s ease both;
+    }
+    .form-section:nth-child(1) { animation-delay: .05s; }
+    .form-section:nth-child(2) { animation-delay: .10s; }
+    .form-section:nth-child(3) { animation-delay: .15s; }
+
+    .section-head {
+      display: flex; align-items: center; gap: .7rem;
+      margin-bottom: 1.4rem; padding-bottom: 1rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .section-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .section-icon svg { width: 16px; height: 16px; stroke: #fff; }
+    .si-teal  { background: rgba(26,107,114,.25); }
+    .si-rose  { background: rgba(192,54,74,.25); }
+    .si-gold  { background: rgba(201,168,76,.2); }
+
+    .section-head-text h3 { font-size: .95rem; font-weight: 600; color: #fff; }
+    .section-head-text p  { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
+
+    /* grid de campos */
+    .fields-grid { display: grid; gap: .9rem; }
+    .g2 { grid-template-columns: 1fr 1fr; }
+    .g3 { grid-template-columns: 1fr 1fr 1fr; }
+    .g1 { grid-template-columns: 1fr; }
+    .span2 { grid-column: span 2; }
+    .span3 { grid-column: span 3; }
+
+    /* campo individual */
+    .field { display: flex; flex-direction: column; gap: .4rem; }
+    .field label {
+      font-size: .72rem; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--muted);
+      display: flex; align-items: center; gap: .3rem;
+    }
+    .req { color: var(--rose-l); font-size: .8rem; }
+
+    .field input, .field select, .field textarea {
+      width: 100%; padding: .7rem .9rem;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 9px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: .88rem;
+      outline: none; transition: border-color .2s, background .2s;
+    }
+    .field select option { background: var(--navy2); }
+    .field textarea { resize: vertical; min-height: 90px; }
+    .field input::placeholder, .field textarea::placeholder { color: rgba(255,255,255,.2); }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--teal-l); background: rgba(26,145,154,.07);
+    }
+    .field input.invalid { border-color: var(--rose-l) !important; }
+
+    /* checkboxes row */
+    .check-row { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .2rem; }
+    .check-item {
+      display: flex; align-items: center; gap: .5rem;
+      background: rgba(255,255,255,.04); border: 1px solid var(--line);
+      border-radius: 8px; padding: .5rem .85rem;
+      cursor: pointer; transition: all .2s; user-select: none;
+      font-size: .83rem; color: var(--muted);
+    }
+    .check-item input[type=checkbox] { display: none; }
+    .check-item .box {
+      width: 16px; height: 16px; border: 1.5px solid rgba(255,255,255,.2);
+      border-radius: 4px; display: grid; place-items: center; flex-shrink: 0;
+      transition: all .2s;
+    }
+    .check-item .box svg { width: 10px; height: 10px; stroke: #fff; opacity: 0; transition: opacity .15s; }
+    .check-item.checked {
+      background: rgba(26,107,114,.15); border-color: rgba(26,107,114,.4); color: var(--teal-l);
+    }
+    .check-item.checked .box { background: var(--teal); border-color: var(--teal); }
+    .check-item.checked .box svg { opacity: 1; }
+
+    /* ══ PAINEL LATERAL DE RISCO ══ */
+    .risk-panel {
+      position: sticky; top: 0;
+      background: var(--navy2); border: 1px solid var(--line);
+      border-radius: 14px; padding: 1.4rem;
+      animation: fadeUp .4s .2s ease both;
+    }
+
+    .risk-panel-title {
+      font-size: .72rem; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted); margin-bottom: 1.2rem;
+    }
+
+    /* medidor */
+    .risk-meter { margin-bottom: 1.4rem; }
+    .risk-score-row { display: flex; align-items: flex-end; gap: .5rem; margin-bottom: .6rem; }
+    .risk-score {
+      font-family: 'Crimson Pro', serif; font-size: 3rem;
+      font-weight: 600; line-height: 1; color: #fff;
+      transition: color .4s;
+    }
+    .risk-score-max { font-size: .8rem; color: var(--muted); margin-bottom: .3rem; }
+    .risk-bar-track {
+      height: 8px; background: rgba(255,255,255,.07);
+      border-radius: 100px; overflow: hidden; margin-bottom: .8rem;
+    }
+    .risk-bar-fill {
+      height: 100%; border-radius: 100px; width: 0%;
+      transition: width .5s cubic-bezier(.4,0,.2,1), background .4s;
+      background: var(--green-l);
+    }
+    .risk-label {
+      display: inline-flex; align-items: center; gap: .5rem;
+      padding: .35rem .9rem; border-radius: 100px;
+      font-size: .8rem; font-weight: 600; letter-spacing: .04em;
+      transition: all .4s;
+    }
+    .risk-label::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .rl-baixo   { background: rgba(42,125,79,.15);  color: var(--green-l); border: 1px solid rgba(42,125,79,.3); }
+    .rl-medio   { background: rgba(26,145,154,.12); color: var(--teal-l);  border: 1px solid rgba(26,145,154,.25); }
+    .rl-alto    { background: rgba(201,168,76,.12); color: var(--gold-l);  border: 1px solid rgba(201,168,76,.25); }
+    .rl-critico { background: rgba(192,54,74,.15);  color: var(--rose-l);  border: 1px solid rgba(192,54,74,.3); animation: pulse 2s infinite; }
+
+    /* fatores */
+    .risk-factors { margin-bottom: 1.4rem; }
+    .risk-factors-title { font-size: .7rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: .7rem; }
+    .factor-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .45rem 0; border-bottom: 1px solid var(--line);
+      font-size: .78rem; color: var(--text); gap: .5rem;
+      animation: fadeUp .3s ease both;
+    }
+    .factor-item:last-child { border-bottom: none; }
+    .factor-pts { color: var(--rose-l); font-weight: 600; font-size: .75rem; white-space: nowrap; }
+    .no-factors { font-size: .78rem; color: var(--muted); font-style: italic; }
+
+    /* botões */
+    .btn-row { display: flex; gap: .7rem; margin-top: 1rem; }
+    .btn-primary {
+      flex: 1; padding: .8rem; border: none; border-radius: 10px;
+      background: linear-gradient(135deg, var(--teal), var(--teal-l));
+      color: #fff; font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 600;
+      cursor: pointer; transition: opacity .2s, transform .15s;
+      box-shadow: 0 6px 20px rgba(26,107,114,.35);
+    }
+    .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+    .btn-secondary {
+      padding: .8rem 1rem; border: 1px solid var(--line);
+      border-radius: 10px; background: transparent;
+      color: var(--muted); font-family: 'DM Sans', sans-serif;
+      font-size: .9rem; cursor: pointer; transition: all .2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,.05); color: var(--text); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes pulse  { 0%,100%{opacity:1;} 50%{opacity:.5;} }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 10px; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      </div>
+      <div class="brand-label">DDM Zona Sul <span>Sistema Interno</span></div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Principal</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Vítimas<span class="badge-count">142</span></div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Agressores</div>
+      <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Ocorrências<span class="badge-count">7</span></div>
+      <div class="nav-section">Análise</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Relatórios</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar Caso</div>
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-avatar">DS</div>
+      <div class="user-info"><div class="user-name">Dra. Silva</div><div class="user-role">Delegada</div></div>
+      <button class="logout-btn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Voltar
+        </button>
+        <div class="topbar-title">Nova Ocorrência</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="form-layout">
+
+        <!-- ══ FORMULÁRIO PRINCIPAL ══ -->
+        <div class="form-col">
+
+          <!-- SEÇÃO 1: VÍTIMA -->
+          <div class="form-section">
+            <div class="section-head">
+              <div class="section-icon si-teal">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div class="section-head-text">
+                <h3>Dados da Vítima</h3>
+                <p>Informações pessoais e de contato</p>
+              </div>
+            </div>
+
+            <div class="fields-grid g2">
+              <div class="field span2">
+                <label>Nome completo <span class="req">*</span></label>
+                <input type="text" id="v-nome" placeholder="Nome completo da vítima" oninput="calcRisco()" />
+              </div>
+              <div class="field">
+                <label>CPF <span class="req">*</span></label>
+                <input type="text" id="v-cpf" placeholder="000.000.000-00" oninput="maskCPF(this); calcRisco()" maxlength="14" />
+              </div>
+              <div class="field">
+                <label>Data de nascimento <span class="req">*</span></label>
+                <input type="date" id="v-nascimento" onchange="calcRisco()" />
+              </div>
+              <div class="field">
+                <label>Telefone <span class="req">*</span></label>
+                <input type="text" id="v-tel" placeholder="(11) 00000-0000" oninput="maskTel(this)" maxlength="15" />
+              </div>
+              <div class="field">
+                <label>Cor / Raça</label>
+                <select id="v-cor" onchange="calcRisco()">
+                  <option value="">Selecione</option>
+                  <option>Branca</option><option>Parda</option><option>Preta</option>
+                  <option>Amarela</option><option>Indígena</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Escolaridade</label>
+                <select id="v-escolaridade">
+                  <option value="">Selecione</option>
+                  <option>Sem escolaridade</option><option>Ensino Fundamental</option>
+                  <option>Ensino Médio</option><option>Técnico</option>
+                  <option>Ensino Superior</option><option>Pós-graduação</option>
+                </select>
+              </div>
+              <div class="field span2">
+                <label>Endereço completo <span class="req">*</span></label>
+                <input type="text" id="v-endereco" placeholder="Rua, número, bairro, cidade" />
+              </div>
+              <div class="field">
+                <label>Setor / Região</label>
+                <select id="v-regiao">
+                  <option value="">Selecione</option>
+                  <option>Jd. Ângela</option><option>Capão Redondo</option><option>Campo Limpo</option>
+                  <option>Grajaú</option><option>Jd. São Luís</option><option>Socorro</option>
+                  <option>Interlagos</option><option>Pedreira</option><option>Cidade Ademar</option><option>M'Boi Mirim</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Possui botão do pânico?</label>
+                <select id="v-panico" onchange="calcRisco()">
+                  <option value="">Selecione</option>
+                  <option value="sim">Sim</option>
+                  <option value="nao">Não</option>
+                </select>
+              </div>
+              <div class="field span2">
+                <label>Possui rede de apoio? (família, amigos)</label>
+                <select id="v-apoio" onchange="calcRisco()">
+                  <option value="">Selecione</option>
+                  <option value="sim">Sim</option>
+                  <option value="nao">Não</option>
+                </select>
+              </div>
+
+              <!-- checkboxes vítima -->
+              <div class="field span2">
+                <label>Filhos menores no domicílio</label>
+                <div class="check-row">
+                  <label class="check-item" onclick="toggleCheck(this,'v-filhos')">
+                    <input type="checkbox" id="v-filhos" onchange="calcRisco()" />
+                    <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    Sim, há filhos menores
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEÇÃO 2: AGRESSOR -->
+          <div class="form-section">
+            <div class="section-head">
+              <div class="section-icon si-rose">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+              </div>
+              <div class="section-head-text">
+                <h3>Dados do Agressor</h3>
+                <p>Identificação e fatores de risco</p>
+              </div>
+            </div>
+
+            <div class="fields-grid g2">
+              <div class="field span2">
+                <label>Nome completo</label>
+                <input type="text" id="a-nome" placeholder="Nome completo do agressor" />
+              </div>
+              <div class="field">
+                <label>CPF</label>
+                <input type="text" id="a-cpf" placeholder="000.000.000-00" oninput="maskCPF(this)" maxlength="14" />
+              </div>
+              <div class="field">
+                <label>Data de nascimento</label>
+                <input type="date" id="a-nascimento" />
+              </div>
+              <div class="field">
+                <label>Grau de parentesco <span class="req">*</span></label>
+                <select id="a-parentesco" onchange="calcRisco()">
+                  <option value="">Selecione</option>
+                  <option value="ex-conjuge">Ex-cônjuge / Ex-companheiro</option>
+                  <option value="conjuge">Cônjuge / Companheiro</option>
+                  <option value="namorado">Namorado / Ex-namorado</option>
+                  <option value="pai">Pai / Padrasto</option>
+                  <option value="irmao">Irmão / Outro familiar</option>
+                  <option value="outro">Conhecido / Vizinho / Outro</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Mora no mesmo domicílio?</label>
+                <select id="a-domicilio" onchange="calcRisco()">
+                  <option value="">Selecione</option>
+                  <option value="sim">Sim</option>
+                  <option value="nao">Não</option>
+                </select>
+              </div>
+
+              <!-- fatores de risco agressor -->
+              <div class="field span2">
+                <label>Fatores de risco identificados</label>
+                <div class="check-row">
+                  <label class="check-item" onclick="toggleCheck(this,'a-arma')">
+                    <input type="checkbox" id="a-arma" onchange="calcRisco()" />
+                    <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    Possui arma
+                  </label>
+                  <label class="check-item" onclick="toggleCheck(this,'a-ameaca')">
+                    <input type="checkbox" id="a-ameaca" onchange="calcRisco()" />
+                    <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    Ameaça de morte
+                  </label>
+                  <label class="check-item" onclick="toggleCheck(this,'a-drogas')">
+                    <input type="checkbox" id="a-drogas" onchange="calcRisco()" />
+                    <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    Uso de drogas / álcool
+                  </label>
+                  <label class="check-item" onclick="toggleCheck(this,'a-historico')">
+                    <input type="checkbox" id="a-historico" onchange="calcRisco()" />
+                    <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    Histórico de ocorrências
+                  </label>
+                  <label class="check-item" onclick="toggleCheck(this,'a-mp')">
+                    <input type="checkbox" id="a-mp" onchange="calcRisco()" />
+                    <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    Descumpriu medida protetiva
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEÇÃO 3: OCORRÊNCIA -->
+          <div class="form-section">
+            <div class="section-head">
+              <div class="section-icon si-gold">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <div class="section-head-text">
+                <h3>Dados da Ocorrência</h3>
+                <p>Natureza, data e descrição do caso</p>
+              </div>
+            </div>
+
+            <div class="fields-grid g2">
+              <div class="field">
+                <label>Natureza da ocorrência <span class="req">*</span></label>
+                <select id="o-natureza" onchange="calcRisco()">
+                  <option value="">Selecione</option>
+                  <option value="ameaca-morte">Ameaça de morte</option>
+                  <option value="lesao-grave">Lesão corporal grave</option>
+                  <option value="lesao-leve">Lesão corporal leve</option>
+                  <option value="psicologica">Violência psicológica</option>
+                  <option value="sexual">Violência sexual</option>
+                  <option value="patrimonial">Violência patrimonial</option>
+                  <option value="stalking">Perseguição / Stalking</option>
+                  <option value="descump-mp">Descumprimento de M.P.</option>
+                  <option value="outro">Outro</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Data e hora da ocorrência <span class="req">*</span></label>
+                <input type="datetime-local" id="o-data" />
+              </div>
+              <div class="field span2">
+                <label>Local da ocorrência</label>
+                <input type="text" id="o-local" placeholder="Onde o episódio ocorreu" />
+              </div>
+              <div class="field">
+                <label>Medida protetiva vigente?</label>
+                <select id="o-mp">
+                  <option value="">Selecione</option>
+                  <option value="sim">Sim</option>
+                  <option value="nao">Não</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Violência física com hospitalização?</label>
+                <select id="o-hosp" onchange="calcRisco()">
+                  <option value="">Selecione</option>
+                  <option value="sim">Sim</option>
+                  <option value="nao">Não</option>
+                </select>
+              </div>
+              <div class="field span2">
+                <label>Descrição / Relato</label>
+                <textarea id="o-descricao" placeholder="Descreva o ocorrido com o máximo de detalhes possível..."></textarea>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /form-col -->
+
+        <!-- ══ PAINEL LATERAL DE RISCO ══ -->
+        <div class="risk-panel">
+          <div class="risk-panel-title">⚡ Avaliação de Risco em Tempo Real</div>
+
+          <div class="risk-meter">
+            <div class="risk-score-row">
+              <div class="risk-score" id="risk-score">0</div>
+              <div class="risk-score-max">/ 310 pts</div>
+            </div>
+            <div class="risk-bar-track">
+              <div class="risk-bar-fill" id="risk-bar"></div>
+            </div>
+            <span class="risk-label rl-baixo" id="risk-label">Baixo</span>
+          </div>
+
+          <div class="risk-factors">
+            <div class="risk-factors-title">Fatores detectados</div>
+            <div id="factors-list">
+              <div class="no-factors">Nenhum fator de risco ainda.</div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn-secondary" type="button" onclick="limparForm()">Limpar</button>
+            <button class="btn-primary" type="button" onclick="salvarCaso()">Salvar Caso</button>
+          </div>
+        </div>
+
+      </div><!-- /form-layout -->
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+  // ══════════════════════════════════════
+  // PESOS DE RISCO — edite aqui facilmente
+  // ══════════════════════════════════════
+  const PESOS = {
+    ameacaMorte:      40,
+    arma:             35,
+    lesaoGrave:       30,
+    descumpMP:        30,
+    exConjuge:        30,
+    mesmoDomicilio:   25,
+    conjuge:          25,
+    historico:        20,
+    namorado:         20,
+    pai:              20,
+    hospitalizacao:   30,
+    drogas:           15,
+    outroFamiliar:    10,
+    filhosmenores:    10,
+    semApoio:         10,
+    semPanico:        10,
+  };
+
+  const TOTAL_MAX = 310;
+
+  function calcRisco() {
+    let pts = 0;
+    const fatores = [];
+
+    // parentesco
+    const parentesco = val('a-parentesco');
+    if (parentesco === 'ex-conjuge')  { pts += PESOS.exConjuge;     fatores.push(['Ex-cônjuge / Ex-companheiro', PESOS.exConjuge]); }
+    if (parentesco === 'conjuge')     { pts += PESOS.conjuge;       fatores.push(['Cônjuge / Companheiro', PESOS.conjuge]); }
+    if (parentesco === 'namorado')    { pts += PESOS.namorado;      fatores.push(['Namorado / Ex-namorado', PESOS.namorado]); }
+    if (parentesco === 'pai')         { pts += PESOS.pai;           fatores.push(['Pai / Padrasto', PESOS.pai]); }
+    if (parentesco === 'irmao')       { pts += PESOS.outroFamiliar; fatores.push(['Outro familiar', PESOS.outroFamiliar]); }
+
+    // domicílio
+    if (val('a-domicilio') === 'sim') { pts += PESOS.mesmoDomicilio; fatores.push(['Mora no mesmo domicílio', PESOS.mesmoDomicilio]); }
+
+    // checkboxes agressor
+    if (chk('a-ameaca'))   { pts += PESOS.ameacaMorte; fatores.push(['Ameaça de morte', PESOS.ameacaMorte]); }
+    if (chk('a-arma'))     { pts += PESOS.arma;        fatores.push(['Possui arma', PESOS.arma]); }
+    if (chk('a-mp'))       { pts += PESOS.descumpMP;   fatores.push(['Descumpriu medida protetiva', PESOS.descumpMP]); }
+    if (chk('a-historico')){ pts += PESOS.historico;   fatores.push(['Histórico de ocorrências', PESOS.historico]); }
+    if (chk('a-drogas'))   { pts += PESOS.drogas;      fatores.push(['Uso de drogas / álcool', PESOS.drogas]); }
+
+    // ocorrência
+    if (val('o-natureza') === 'ameaca-morte') { pts += PESOS.ameacaMorte; fatores.push(['Natureza: ameaça de morte', PESOS.ameacaMorte]); }
+    if (val('o-natureza') === 'lesao-grave')  { pts += PESOS.lesaoGrave;  fatores.push(['Natureza: lesão grave', PESOS.lesaoGrave]); }
+    if (val('o-hosp') === 'sim')              { pts += PESOS.hospitalizacao; fatores.push(['Hospitalização', PESOS.hospitalizacao]); }
+
+    // vítima
+    if (val('v-panico') === 'nao') { pts += PESOS.semPanico; fatores.push(['Sem botão do pânico', PESOS.semPanico]); }
+    if (val('v-apoio')  === 'nao') { pts += PESOS.semApoio;  fatores.push(['Sem rede de apoio', PESOS.semApoio]); }
+    if (chk('v-filhos'))           { pts += PESOS.filhosmenores; fatores.push(['Filhos menores no domicílio', PESOS.filhosmenores]); }
+
+    // cap no total máximo
+    pts = Math.min(pts, TOTAL_MAX);
+
+    // determina nível
+    let nivel, labelClass;
+    if      (pts >= 81) { nivel = 'Crítico'; labelClass = 'rl-critico'; }
+    else if (pts >= 51) { nivel = 'Alto';    labelClass = 'rl-alto'; }
+    else if (pts >= 21) { nivel = 'Médio';   labelClass = 'rl-medio'; }
+    else                { nivel = 'Baixo';   labelClass = 'rl-baixo'; }
+
+    // cores da barra
+    const barColors = { Baixo: '#35a066', Médio: '#22919a', Alto: '#e0bc6a', Crítico: '#e04d62' };
+
+    // atualiza UI
+    document.getElementById('risk-score').textContent = pts;
+    const bar = document.getElementById('risk-bar');
+    bar.style.width  = (pts / TOTAL_MAX * 100) + '%';
+    bar.style.background = barColors[nivel];
+
+    const lbl = document.getElementById('risk-label');
+    lbl.textContent = nivel;
+    lbl.className = 'risk-label ' + labelClass;
+
+    // fatores
+    const list = document.getElementById('factors-list');
+    if (fatores.length === 0) {
+      list.innerHTML = '<div class="no-factors">Nenhum fator de risco ainda.</div>';
+    } else {
+      list.innerHTML = fatores
+        .sort((a, b) => b[1] - a[1])
+        .map(([nome, p]) => `
+          <div class="factor-item">
+            <span>${nome}</span>
+            <span class="factor-pts">+${p}</span>
+          </div>`)
+        .join('');
+    }
+  }
+
+  // ── helpers ──
+  function val(id) { return document.getElementById(id)?.value || ''; }
+  function chk(id) { return document.getElementById(id)?.checked || false; }
+
+  function toggleCheck(label, id) {
+    const cb = document.getElementById(id);
+    cb.checked = !cb.checked;
+    label.classList.toggle('checked', cb.checked);
+    calcRisco();
+  }
+
+  // máscaras
+  function maskCPF(el) {
+    let v = el.value.replace(/\D/g, '').slice(0, 11);
+    v = v.replace(/(\d{3})(\d)/, '$1.$2')
+         .replace(/(\d{3})(\d)/, '$1.$2')
+         .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    el.value = v;
+  }
+  function maskTel(el) {
+    let v = el.value.replace(/\D/g, '').slice(0, 11);
+    if (v.length <= 10) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+    else                v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+    el.value = v;
+  }
+
+  // limpar
+  function limparForm() {
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+      if (el.type === 'checkbox') { el.checked = false; }
+      else { el.value = ''; }
+    });
+    document.querySelectorAll('.check-item').forEach(l => l.classList.remove('checked'));
+    calcRisco();
+  }
+
+  // salvar (mock — conectar ao backend depois)
+  function salvarCaso() {
+    const obrigatorios = ['v-nome','v-cpf','v-nascimento','v-tel','v-endereco','a-parentesco','o-natureza','o-data'];
+    let valido = true;
+    obrigatorios.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) { el.classList.add('invalid'); valido = false; }
+      else { el.classList.remove('invalid'); }
+    });
+    if (!valido) { alert('Preencha todos os campos obrigatórios (marcados com *).'); return; }
+    alert('✅ Caso registrado com sucesso!\n\n(Aqui será feita a chamada à API Spring Boot)');
+  }
+</script>
+</body>
+</html>

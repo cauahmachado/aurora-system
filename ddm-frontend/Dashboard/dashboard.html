@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DDM Zona Sul — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #0d1b2a;
+      --navy2:   #111f30;
+      --navy3:   #162840;
+      --teal:    #1a6b72;
+      --teal-l:  #22919a;
+      --rose:    #c0364a;
+      --rose-l:  #e04d62;
+      --gold:    #c9a84c;
+      --gold-l:  #e0bc6a;
+      --green:   #2a7d4f;
+      --green-l: #35a066;
+      --text:    #e8e2da;
+      --muted:   #7a93a8;
+      --line:    rgba(255,255,255,0.07);
+      --sidebar: 230px;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ── LAYOUT ── */
+    .app { display: flex; height: 100vh; }
+
+    /* ══════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════ */
+    .sidebar {
+      width: var(--sidebar);
+      min-width: var(--sidebar);
+      background: var(--navy2);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      z-index: 10;
+    }
+
+    .sidebar-brand {
+      padding: 1.4rem 1.2rem 1.2rem;
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .brand-icon {
+      width: 36px; height: 36px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--teal), var(--teal-l));
+      border-radius: 8px;
+      display: grid; place-items: center;
+      box-shadow: 0 0 18px rgba(26,107,114,.4);
+    }
+    .brand-icon svg { width: 18px; height: 18px; fill: #fff; }
+    .brand-label { font-size: .78rem; font-weight: 600; color: #fff; line-height: 1.3; }
+    .brand-label span { display: block; font-size: .68rem; font-weight: 400; color: var(--muted); }
+
+    .nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
+    .nav-section {
+      font-size: .65rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      padding: .8rem 1.2rem .4rem;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .65rem 1.2rem;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all .2s;
+      font-size: .87rem;
+      color: var(--muted);
+      user-select: none;
+    }
+    .nav-item svg { width: 17px; height: 17px; stroke: currentColor; flex-shrink: 0; }
+    .nav-item:hover { background: rgba(255,255,255,.04); color: var(--text); }
+    .nav-item.active {
+      background: rgba(26,107,114,.12);
+      border-left-color: var(--teal-l);
+      color: var(--teal-l);
+    }
+    .nav-item .badge-count {
+      margin-left: auto;
+      background: var(--rose);
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 600;
+      padding: .15rem .45rem;
+      border-radius: 100px;
+    }
+
+    .sidebar-user {
+      padding: 1rem 1.2rem;
+      border-top: 1px solid var(--line);
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .user-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--rose), var(--rose-l));
+      display: grid; place-items: center;
+      font-size: .8rem; font-weight: 600; color: #fff; flex-shrink: 0;
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: .82rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-role { font-size: .7rem; color: var(--muted); }
+    .logout-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); padding: .3rem;
+      transition: color .2s;
+    }
+    .logout-btn:hover { color: var(--rose-l); }
+    .logout-btn svg { width: 16px; height: 16px; stroke: currentColor; display: block; }
+
+    /* ══════════════════════════════════════
+       MAIN
+    ══════════════════════════════════════ */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* topbar */
+    .topbar {
+      padding: 1.1rem 2rem;
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .topbar-title { font-family: 'Crimson Pro', serif; font-size: 1.4rem; font-weight: 600; color: #fff; }
+    .topbar-date { font-size: .8rem; color: var(--muted); }
+    .topbar-right { display: flex; align-items: center; gap: 1rem; }
+    .alert-bell {
+      position: relative; cursor: pointer;
+      background: rgba(255,255,255,.05); border: 1px solid var(--line);
+      border-radius: 8px; padding: .45rem;
+      transition: background .2s;
+    }
+    .alert-bell:hover { background: rgba(255,255,255,.09); }
+    .alert-bell svg { width: 18px; height: 18px; stroke: var(--muted); display: block; }
+    .alert-dot {
+      position: absolute; top: 6px; right: 6px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--rose); border: 1px solid var(--navy2);
+      animation: pulse 2s infinite;
+    }
+
+    /* content scroll area */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.8rem 2rem 2rem;
+    }
+
+    /* ══════════════════════════════════════
+       ZONA 1 — CARDS
+    ══════════════════════════════════════ */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .card {
+      background: var(--navy2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1.3rem 1.4rem;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp .5s ease both;
+    }
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      border-radius: 14px 14px 0 0;
+    }
+    .card.c-teal::before   { background: linear-gradient(90deg, var(--teal), var(--teal-l)); }
+    .card.c-rose::before   { background: linear-gradient(90deg, var(--rose), var(--rose-l)); }
+    .card.c-gold::before   { background: linear-gradient(90deg, #8b6914, var(--gold-l)); }
+    .card.c-green::before  { background: linear-gradient(90deg, var(--green), var(--green-l)); }
+
+    .card:nth-child(1) { animation-delay: .05s; }
+    .card:nth-child(2) { animation-delay: .1s; }
+    .card:nth-child(3) { animation-delay: .15s; }
+    .card:nth-child(4) { animation-delay: .2s; }
+
+    .card-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: grid; place-items: center;
+      margin-bottom: .9rem;
+    }
+    .card-icon svg { width: 20px; height: 20px; stroke: #fff; }
+    .card.c-teal  .card-icon { background: rgba(26,107,114,.25); }
+    .card.c-rose  .card-icon { background: rgba(192,54,74,.25); }
+    .card.c-gold  .card-icon { background: rgba(201,168,76,.2); }
+    .card.c-green .card-icon { background: rgba(42,125,79,.25); }
+
+    .card-label { font-size: .73rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: .35rem; }
+    .card-value { font-family: 'Crimson Pro', serif; font-size: 2.2rem; font-weight: 600; color: #fff; line-height: 1; }
+    .card-sub { font-size: .75rem; color: var(--muted); margin-top: .4rem; }
+    .card-sub .up   { color: var(--rose-l); }
+    .card-sub .down { color: var(--green-l); }
+
+    /* ══════════════════════════════════════
+       ZONA 2 — PAINEL DE RISCO
+    ══════════════════════════════════════ */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Crimson Pro', serif;
+      font-size: 1.2rem; font-weight: 600; color: #fff;
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .section-title .dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--rose); animation: pulse 2s infinite;
+    }
+    .section-link {
+      font-size: .8rem; color: var(--teal-l); cursor: pointer;
+      text-decoration: none; transition: color .2s;
+    }
+    .section-link:hover { color: #fff; }
+
+    .risk-table {
+      background: var(--navy2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 1.8rem;
+      animation: fadeUp .5s .25s ease both;
+    }
+    .risk-table table { width: 100%; border-collapse: collapse; }
+    .risk-table th {
+      font-size: .7rem; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted); font-weight: 500;
+      padding: .8rem 1.2rem;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.02);
+    }
+    .risk-table td {
+      padding: .85rem 1.2rem;
+      font-size: .85rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+    }
+    .risk-table tr:last-child td { border-bottom: none; }
+    .risk-table tr:hover td { background: rgba(255,255,255,.02); }
+
+    .risk-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .25rem .7rem;
+      border-radius: 100px;
+      font-size: .72rem; font-weight: 600;
+      letter-spacing: .04em;
+    }
+    .risk-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .risk-critico { background: rgba(192,54,74,.15); color: #e04d62; border: 1px solid rgba(192,54,74,.3); }
+    .risk-alto    { background: rgba(201,168,76,.12); color: #e0bc6a; border: 1px solid rgba(201,168,76,.25); }
+    .risk-medio   { background: rgba(26,145,154,.12); color: #22919a; border: 1px solid rgba(26,145,154,.25); }
+    .risk-baixo   { background: rgba(42,125,79,.12);  color: #35a066; border: 1px solid rgba(42,125,79,.25); }
+
+    .vitima-name { font-weight: 500; color: #fff; }
+    .vitima-id   { font-size: .72rem; color: var(--muted); }
+
+    .btn-ver {
+      background: rgba(26,107,114,.15);
+      border: 1px solid rgba(26,107,114,.3);
+      color: var(--teal-l);
+      padding: .3rem .8rem;
+      border-radius: 6px;
+      font-size: .75rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all .2s;
+    }
+    .btn-ver:hover { background: rgba(26,107,114,.3); }
+
+    /* ══════════════════════════════════════
+       ZONA 3 — GRÁFICOS
+    ══════════════════════════════════════ */
+    .chart-tabs {
+      display: flex; gap: .5rem;
+      margin-bottom: 1.2rem;
+    }
+    .chart-tab {
+      padding: .45rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .82rem;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .chart-tab.active {
+      background: var(--navy3);
+      border-color: var(--teal-l);
+      color: var(--teal-l);
+    }
+
+    .chart-panels .panel { display: none; }
+    .chart-panels .panel.active { display: grid; }
+
+    .charts-2col { grid-template-columns: 1.6fr 1fr; gap: 1rem; }
+    .charts-3col { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .charts-full { grid-template-columns: 1fr; gap: 1rem; }
+
+    .chart-card {
+      background: var(--navy2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1.3rem 1.4rem;
+      animation: fadeUp .4s ease both;
+    }
+    .chart-card-title {
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .chart-wrap { position: relative; }
+    .chart-wrap.h220 { height: 220px; }
+    .chart-wrap.h200 { height: 200px; }
+    .chart-wrap.h260 { height: 260px; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; } 50% { opacity: .4; }
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 10px; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      </div>
+      <div class="brand-label">DDM Zona Sul <span>Sistema Interno</span></div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-section">Principal</div>
+
+      <div class="nav-item active" onclick="setNav(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        Dashboard
+      </div>
+
+      <div class="nav-item" onclick="setNav(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </svg>
+        Vítimas
+        <span class="badge-count">142</span>
+      </div>
+
+      <div class="nav-item" onclick="setNav(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+        </svg>
+        Agressores
+      </div>
+
+      <div class="nav-item" onclick="setNav(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+        Ocorrências
+        <span class="badge-count">7</span>
+      </div>
+
+      <div class="nav-section">Análise</div>
+
+      <div class="nav-item" onclick="setNav(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        Relatórios
+      </div>
+
+      <div class="nav-item" onclick="setNav(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Buscar Caso
+      </div>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">DS</div>
+      <div class="user-info">
+        <div class="user-name">Dra. Silva</div>
+        <div class="user-role">Delegada</div>
+      </div>
+      <button class="logout-btn" title="Sair">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main">
+
+    <!-- topbar -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Dashboard</div>
+        <div class="topbar-date" id="current-date"></div>
+      </div>
+      <div class="topbar-right">
+        <div class="alert-bell">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="alert-dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- content -->
+    <div class="content">
+
+      <!-- ── ZONA 1: CARDS ── -->
+      <div class="cards-grid">
+        <div class="card c-teal">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </div>
+          <div class="card-label">Total de Casos</div>
+          <div class="card-value">248</div>
+          <div class="card-sub"><span class="up">↑ 12</span> este mês</div>
+        </div>
+
+        <div class="card c-rose">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <div class="card-label">Risco Crítico / Alto</div>
+          <div class="card-value">31</div>
+          <div class="card-sub"><span class="up">↑ 4</span> desde ontem</div>
+        </div>
+
+        <div class="card c-gold">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <div class="card-label">Registros Hoje</div>
+          <div class="card-value">7</div>
+          <div class="card-sub"><span class="down">↓ 2</span> vs. média</div>
+        </div>
+
+        <div class="card c-green">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div class="card-label">Casos Encerrados</div>
+          <div class="card-value">189</div>
+          <div class="card-sub"><span class="down">76%</span> do total</div>
+        </div>
+      </div>
+
+      <!-- ── ZONA 2: PAINEL DE RISCO ── -->
+      <div class="section-header">
+        <div class="section-title">
+          <span class="dot"></span>
+          Casos de Atenção Imediata
+        </div>
+        <a class="section-link">Ver todos →</a>
+      </div>
+
+      <div class="risk-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Vítima</th>
+              <th>Natureza</th>
+              <th>Agressor</th>
+              <th>Grau</th>
+              <th>Botão Pânico</th>
+              <th>Risco</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="vitima-name">M. R. S.</div><div class="vitima-id">#2024-0318</div></td>
+              <td>Ameaça de morte</td>
+              <td>J. A. R.</td>
+              <td>Cônjuge</td>
+              <td>✅ Sim</td>
+              <td><span class="risk-badge risk-critico">Crítico</span></td>
+              <td><button class="btn-ver">Ver caso</button></td>
+            </tr>
+            <tr>
+              <td><div class="vitima-name">A. L. F.</div><div class="vitima-id">#2024-0301</div></td>
+              <td>Lesão corporal</td>
+              <td>R. F. M.</td>
+              <td>Ex-companheiro</td>
+              <td>❌ Não</td>
+              <td><span class="risk-badge risk-critico">Crítico</span></td>
+              <td><button class="btn-ver">Ver caso</button></td>
+            </tr>
+            <tr>
+              <td><div class="vitima-name">P. C. O.</div><div class="vitima-id">#2024-0287</div></td>
+              <td>Descumprimento MP</td>
+              <td>C. O. S.</td>
+              <td>Pai</td>
+              <td>✅ Sim</td>
+              <td><span class="risk-badge risk-alto">Alto</span></td>
+              <td><button class="btn-ver">Ver caso</button></td>
+            </tr>
+            <tr>
+              <td><div class="vitima-name">L. B. T.</div><div class="vitima-id">#2024-0265</div></td>
+              <td>Violência psicológica</td>
+              <td>M. T. B.</td>
+              <td>Cônjuge</td>
+              <td>❌ Não</td>
+              <td><span class="risk-badge risk-alto">Alto</span></td>
+              <td><button class="btn-ver">Ver caso</button></td>
+            </tr>
+            <tr>
+              <td><div class="vitima-name">C. M. P.</div><div class="vitima-id">#2024-0244</div></td>
+              <td>Stalking</td>
+              <td>F. P. L.</td>
+              <td>Ex-namorado</td>
+              <td>❌ Não</td>
+              <td><span class="risk-badge risk-medio">Médio</span></td>
+              <td><button class="btn-ver">Ver caso</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── ZONA 3: GRÁFICOS ── -->
+      <div class="section-header">
+        <div class="section-title">Análise Estatística</div>
+      </div>
+
+      <div class="chart-tabs">
+        <button class="chart-tab active" onclick="switchChartTab('temporal', this)">Temporal</button>
+        <button class="chart-tab" onclick="switchChartTab('vitima', this)">Perfil da Vítima</button>
+        <button class="chart-tab" onclick="switchChartTab('agressor', this)">Perfil do Agressor</button>
+        <button class="chart-tab" onclick="switchChartTab('geo', this)">Regiões</button>
+      </div>
+
+      <div class="chart-panels">
+
+        <!-- TEMPORAL -->
+        <div class="panel active charts-2col" id="panel-temporal">
+          <div class="chart-card">
+            <div class="chart-card-title">Casos por Mês — 2024</div>
+            <div class="chart-wrap h220"><canvas id="chart-mensal"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-title">Status dos Casos</div>
+            <div class="chart-wrap h220"><canvas id="chart-status"></canvas></div>
+          </div>
+        </div>
+
+        <!-- PERFIL VÍTIMA -->
+        <div class="panel charts-3col" id="panel-vitima">
+          <div class="chart-card">
+            <div class="chart-card-title">Faixa Etária</div>
+            <div class="chart-wrap h200"><canvas id="chart-idade"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-title">Escolaridade</div>
+            <div class="chart-wrap h200"><canvas id="chart-escolaridade"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-title">Cor / Raça</div>
+            <div class="chart-wrap h200"><canvas id="chart-cor"></canvas></div>
+          </div>
+        </div>
+
+        <!-- PERFIL AGRESSOR -->
+        <div class="panel charts-2col" id="panel-agressor">
+          <div class="chart-card">
+            <div class="chart-card-title">Grau de Parentesco</div>
+            <div class="chart-wrap h260"><canvas id="chart-parentesco"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-title">Uso de Drogas / Álcool</div>
+            <div class="chart-wrap h260"><canvas id="chart-drogas"></canvas></div>
+          </div>
+        </div>
+
+        <!-- REGIÕES -->
+        <div class="panel charts-full" id="panel-geo">
+          <div class="chart-card">
+            <div class="chart-card-title">Ocorrências por Setor / Região</div>
+            <div class="chart-wrap h260"><canvas id="chart-regioes"></canvas></div>
+          </div>
+        </div>
+
+      </div><!-- /chart-panels -->
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+  // ── DATA MOCK ──
+  const CORES = {
+    teal:    'rgba(34,145,154,1)',
+    tealA:   'rgba(34,145,154,0.6)',
+    rose:    'rgba(224,77,98,1)',
+    roseA:   'rgba(224,77,98,0.6)',
+    gold:    'rgba(224,188,106,1)',
+    goldA:   'rgba(224,188,106,0.5)',
+    green:   'rgba(53,160,102,1)',
+    greenA:  'rgba(53,160,102,0.6)',
+    navy3:   'rgba(22,40,64,1)',
+    muted:   'rgba(122,147,168,0.5)',
+  };
+
+  const DEFAULTS = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7a93a8', font: { size: 11 } } },
+      y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7a93a8', font: { size: 11 } } }
+    }
+  };
+  const NO_SCALE = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+
+  // data
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+  // ── CHARTS ──
+  // 1. Mensal
+  new Chart(document.getElementById('chart-mensal'), {
+    type: 'line',
+    data: {
+      labels: meses,
+      datasets: [{
+        data: [18,22,19,25,30,27,24,28,32,29,26,31],
+        borderColor: CORES.teal, backgroundColor: 'rgba(34,145,154,0.1)',
+        fill: true, tension: 0.4, pointBackgroundColor: CORES.teal,
+        pointRadius: 4, pointHoverRadius: 6
+      }]
+    },
+    options: DEFAULTS
+  });
+
+  // 2. Status (donut)
+  new Chart(document.getElementById('chart-status'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Encerrados','Em andamento','Suspensos'],
+      datasets: [{ data: [189, 47, 12],
+        backgroundColor: [CORES.green, CORES.teal, CORES.gold],
+        borderColor: '#111f30', borderWidth: 3
+      }]
+    },
+    options: {
+      ...NO_SCALE,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: { color: '#7a93a8', font: { size: 11 }, padding: 14, boxWidth: 12 }
+        }
+      },
+      cutout: '65%'
+    }
+  });
+
+  // 3. Faixa etária
+  new Chart(document.getElementById('chart-idade'), {
+    type: 'bar',
+    data: {
+      labels: ['< 18','18-25','26-35','36-45','46-55','> 55'],
+      datasets: [{ data: [8,42,68,52,33,17],
+        backgroundColor: CORES.tealA, borderColor: CORES.teal, borderWidth: 1, borderRadius: 5
+      }]
+    },
+    options: DEFAULTS
+  });
+
+  // 4. Escolaridade
+  new Chart(document.getElementById('chart-escolaridade'), {
+    type: 'bar',
+    data: {
+      labels: ['Nenhuma','Fund.','Médio','Técnico','Superior','Pós-grad.'],
+      datasets: [{ data: [12,38,74,21,42,8],
+        backgroundColor: CORES.goldA, borderColor: CORES.gold, borderWidth: 1, borderRadius: 5,
+        indexAxis: 'y'
+      }]
+    },
+    options: { ...DEFAULTS, indexAxis: 'y' }
+  });
+
+  // 5. Cor / raça
+  new Chart(document.getElementById('chart-cor'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Parda','Branca','Preta','Amarela','Indígena'],
+      datasets: [{ data: [98,74,52,14,10],
+        backgroundColor: [CORES.gold,'rgba(200,200,200,0.5)',CORES.rose,CORES.teal,CORES.green],
+        borderColor: '#111f30', borderWidth: 3
+      }]
+    },
+    options: {
+      ...NO_SCALE,
+      plugins: {
+        legend: { display: true, position: 'bottom', labels: { color: '#7a93a8', font: { size: 10 }, padding: 10, boxWidth: 10 } }
+      },
+      cutout: '60%'
+    }
+  });
+
+  // 6. Parentesco
+  new Chart(document.getElementById('chart-parentesco'), {
+    type: 'bar',
+    data: {
+      labels: ['Cônjuge','Ex-cônjuge','Companheiro','Ex-comp.','Pai/Padrasto','Irmão','Outro'],
+      datasets: [{ data: [72,54,38,41,22,11,10],
+        backgroundColor: CORES.roseA, borderColor: CORES.rose, borderWidth: 1, borderRadius: 5,
+        indexAxis: 'y'
+      }]
+    },
+    options: { ...DEFAULTS, indexAxis: 'y' }
+  });
+
+  // 7. Drogas
+  new Chart(document.getElementById('chart-drogas'), {
+    type: 'bar',
+    data: {
+      labels: ['Álcool','Crack','Maconha','Cocaína','Múltiplas','Nenhuma'],
+      datasets: [
+        { label: 'Agressor', data: [88,32,24,18,14,72], backgroundColor: CORES.roseA, borderColor: CORES.rose, borderWidth: 1, borderRadius: 4 },
+        { label: 'Vítima',   data: [22,8,5,4,3,206],    backgroundColor: CORES.tealA, borderColor: CORES.teal, borderWidth: 1, borderRadius: 4 }
+      ]
+    },
+    options: {
+      ...DEFAULTS,
+      plugins: {
+        legend: { display: true, position: 'top', labels: { color: '#7a93a8', font: { size: 11 }, boxWidth: 12 } }
+      }
+    }
+  });
+
+  // 8. Regiões
+  new Chart(document.getElementById('chart-regioes'), {
+    type: 'bar',
+    data: {
+      labels: ['Jd. Ângela','Capão Redondo','Campo Limpo','Grajaú','Jd. São Luís','Socorro','Interlagos','Pedreira','Cidade Ademar','M\'Boi Mirim'],
+      datasets: [{ data: [48,41,38,35,29,24,21,18,15,12],
+        backgroundColor: (ctx) => {
+          const v = ctx.raw;
+          if (v >= 40) return CORES.roseA;
+          if (v >= 25) return CORES.goldA;
+          return CORES.tealA;
+        },
+        borderWidth: 0, borderRadius: 5
+      }]
+    },
+    options: {
+      ...DEFAULTS,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: (c) => ` ${c.raw} ocorrências` } }
+      }
+    }
+  });
+
+  // ── NAVEGAÇÃO ──
+  function setNav(el) {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // ── TABS GRÁFICOS ──
+  function switchChartTab(id, btn) {
+    document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.chart-panels .panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + id).classList.add('active');
+  }
+
+  // ── DATA ATUAL ──
+  const now = new Date();
+  document.getElementById('current-date').textContent =
+    now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+</script>
+
+</body>
+</html>
